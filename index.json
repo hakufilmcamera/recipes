@@ -1,0 +1,56 @@
+{
+  "recipes": [
+    {
+      "name": "Morning Paper",
+      "author": "haku",
+      "note": "Linen pulled back with a soft shoulder - quiet daylight, kind to skin.",
+      "recipe": {
+        "id": "D15594A8-D47D-49A4-A751-9B27DE3A0BFC",
+        "name": "Morning Paper",
+        "edit": {
+          "filmSimulation": "Linen",
+          "filmSimulationStrength": 0.7,
+          "shoulder": 0.35,
+          "grain": 0.15,
+          "grainSize": 1.2
+        },
+        "created": 776000000
+      }
+    },
+    {
+      "name": "Harbour Nights",
+      "author": "haku",
+      "note": "Slate with halation and coarse grain, for streetlights after rain.",
+      "recipe": {
+        "id": "718105D1-967B-4C0C-A91B-80209008BC42",
+        "name": "Harbour Nights",
+        "edit": {
+          "filmSimulation": "Slate",
+          "filmSimulationStrength": 0.85,
+          "halation": 0.45,
+          "halationRadius": 0.045,
+          "grain": 0.35,
+          "grainSize": 2.0,
+          "shadows": 0.3
+        },
+        "created": 776000000
+      }
+    },
+    {
+      "name": "Postcard",
+      "author": "haku",
+      "note": "Kingfisher at full strength with density - saturated skies, deep water.",
+      "recipe": {
+        "id": "6D1D945D-04AB-4D1A-A3F5-485F3BF0EB4B",
+        "name": "Postcard",
+        "edit": {
+          "filmSimulation": "Kingfisher",
+          "colorChrome": 0.6,
+          "colorChromeBlue": 0.5,
+          "vignette": 0.15
+        },
+        "created": 776000000
+      }
+    }
+  ]
+}

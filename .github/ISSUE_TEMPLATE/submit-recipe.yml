@@ -1,0 +1,34 @@
+name: Submit a recipe
+description: Offer a recipe to Haku's community page.
+title: "[Recipe] "
+labels: [recipe]
+body:
+  - type: input
+    id: author
+    attributes:
+      label: Name to credit
+      description: Shown beside your recipe in the app. A first name or handle is plenty.
+    validations:
+      required: true
+  - type: input
+    id: note
+    attributes:
+      label: What is it for?
+      description: One line - the light or subject it suits.
+    validations:
+      required: true
+  - type: textarea
+    id: json
+    attributes:
+      label: Recipe JSON
+      description: Haku put this on your clipboard when you tapped Community - paste it here.
+      render: json
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: The rule
+      options:
+        - label: This recipe uses only a look that ships with Haku, and I publish it under CC0.
+          required: true
