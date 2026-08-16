@@ -28,7 +28,10 @@ settings, and settings want to be copied.
 ## Voting
 
 Each merged recipe keeps its submission issue open, and a thumbs-up
-reaction on that issue is a vote. Vote counts are copied into `index.json`
+reaction on that issue is a vote. **Where to find it:** open the recipe's
+issue and look just under the first post for the small smiley-face button
+- tap it and pick 👍. On the mobile site it sits between the post body and
+the comments; on desktop it is at the bottom-left of the post. Vote counts are copied into `index.json`
 when recipes are merged or updated, and the app shows its Community page
 sorted by them - the app itself never counts or sends anything.
 
