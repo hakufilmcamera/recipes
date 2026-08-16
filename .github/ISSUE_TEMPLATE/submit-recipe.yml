@@ -21,7 +21,7 @@ body:
     id: json
     attributes:
       label: Recipe JSON
-      description: Haku put this on your clipboard when you tapped Community - paste it here.
+      description: Haku fills this in when you tap Community. If it arrived empty, paste - the recipe is on your clipboard.
       render: json
     validations:
       required: true
