@@ -25,6 +25,13 @@ them out regardless.
 By submitting you agree your recipe is published under CC0 - recipes are
 settings, and settings want to be copied.
 
+## Voting
+
+Each merged recipe keeps its submission issue open, and a thumbs-up
+reaction on that issue is a vote. Vote counts are copied into `index.json`
+when recipes are merged or updated, and the app shows its Community page
+sorted by them - the app itself never counts or sends anything.
+
 ## How this works
 
 `index.json` is the whole database. The app fetches it, nothing more - no
