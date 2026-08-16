@@ -1,5 +1,10 @@
 # Approving is adding a label - from the GitHub app, on a phone, in bed.
 # This does the merge: index.json gains the recipe, the issue closes.
+#
+# The condition sits on the STEPS rather than the job, deliberately. On the
+# job, every other label - `ready`, which the checker adds itself - produced
+# a run with no jobs in it, which GitHub reports as a failure and emails
+# about. Here the job always runs and does nothing, quietly.
 name: Publish an approved recipe
 
 on:
@@ -12,11 +17,12 @@ permissions:
 
 jobs:
   publish:
-    if: github.event.label.name == 'approve'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        if: github.event.label.name == 'approve'
       - name: Merge into the index
+        if: github.event.label.name == 'approve'
         env:
           BODY: ${{ github.event.issue.body }}
           NUMBER: ${{ github.event.issue.number }}
@@ -59,6 +65,8 @@ jobs:
           git add index.json
           git commit -m "Publish recipe from #${NUMBER}"
           git push
-          gh issue comment "$NUMBER" --repo "$REPO" --body "Published - it is in the app's Community page now. Thank you.
-
-A 👍 on this issue is a vote for it; the count rides into the app when the list refreshes."
+          # One line: a multi-line body here put its continuation at column
+          # zero, which breaks out of the YAML block scalar and made this
+          # whole workflow unparseable - it could not run at all, and the
+          # only symptom was a "no jobs were run" email on every push.
+          gh issue comment "$NUMBER" --repo "$REPO" --body "Published - it is in the app's Community page now. Thank you. A vote for it is one tap in the app."
