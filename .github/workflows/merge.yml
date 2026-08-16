@@ -1,0 +1,64 @@
+# Approving is adding a label - from the GitHub app, on a phone, in bed.
+# This does the merge: index.json gains the recipe, the issue closes.
+name: Publish an approved recipe
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  publish:
+    if: github.event.label.name == 'approve'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge into the index
+        env:
+          BODY: ${{ github.event.issue.body }}
+          NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+
+          BUNDLED = {"Linen","Dune","Slate","Pewter","Lichen",
+                     "Harbour","Ember","Kingfisher","Ink"}
+          body = os.environ["BODY"]
+
+          def section(label):
+              m = re.search(rf"\*\*{re.escape(label)}\*\*\s*\n+(.*?)(?=\n\*\*|\Z)", body, re.S)
+              if m: return m.group(1).strip()
+              m = re.search(rf"### {re.escape(label)}\s*\n+(.*?)(?=\n### |\Z)", body, re.S)
+              return m.group(1).strip() if m else ""
+
+          recipe = json.loads(re.search(r"```(?:json)?\s*(.+?)```", body, re.S).group(1))
+          if isinstance(recipe, list): recipe = recipe[0]
+          look = recipe["edit"]["filmSimulation"]
+          assert look in BUNDLED, f"{look} is not bundled - refusing to publish"
+
+          index = json.load(open("index.json"))
+          index["recipes"] = [r for r in index["recipes"]
+                              if r["name"].lower() != recipe["name"].lower()]
+          index["recipes"].append({
+              "name": recipe["name"],
+              "author": section("Name to credit") or "anonymous",
+              "note": section("What is it for?"),
+              "recipe": recipe,
+              "votes": 0,
+              "issue": int(os.environ["NUMBER"]),
+          })
+          json.dump(index, open("index.json", "w"), indent=2)
+          PY
+          git config user.name "hakufilmcamera"
+          git config user.email "hakufilmcamera@gmail.com"
+          git add index.json
+          git commit -m "Publish recipe from #${NUMBER}"
+          git push
+          gh issue comment "$NUMBER" --repo "$REPO" --body "Published - it is in the app's Community page now. Thank you.
+
+A 👍 on this issue is a vote for it; the count rides into the app when the list refreshes."

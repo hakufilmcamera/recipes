@@ -1,0 +1,88 @@
+# Every submission is checked the moment it arrives, and the result is
+# posted on the issue - so moderation is reading one comment rather than
+# reading JSON. Nothing here publishes: it labels and reports.
+name: Check a submission
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check:
+    if: contains(github.event.issue.labels.*.name, 'recipe')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate
+        env:
+          BODY: ${{ github.event.issue.body }}
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY' > result.md
+          import json, os, re, sys
+
+          BUNDLED = {"Linen","Dune","Slate","Pewter","Lichen",
+                     "Harbour","Ember","Kingfisher","Ink"}
+          PAID = [("halation", "Halation"), ("motionBlur", "Motion blur"),
+                  ("portraitAmount", "Portrait"), ("effectKind", "Relights"),
+                  ("dateStamp", "Print stage"), ("archiveKind", "Print stage"),
+                  ("paperKind", "Print stage"), ("edgeKind", "Print stage")]
+
+          body = os.environ["BODY"]
+          problems, notes = [], []
+
+          m = re.search(r"```(?:json)?\s*(.+?)```", body, re.S)
+          if not m:
+              print("### Cannot read this one\n\nNo recipe JSON found in the issue.")
+              sys.exit(0)
+          try:
+              payload = json.loads(m.group(1))
+          except Exception as e:
+              print(f"### Cannot read this one\n\nThe JSON did not parse: `{e}`")
+              sys.exit(0)
+
+          recipe = payload[0] if isinstance(payload, list) else payload
+          edit = recipe.get("edit", {})
+          look = edit.get("filmSimulation")
+          name = recipe.get("name", "?")
+
+          if look not in BUNDLED:
+              problems.append(f"Uses **{look}**, which is not a look Haku ships with.")
+
+          index = json.load(open("index.json"))
+          if any(r["name"].lower() == name.lower() for r in index["recipes"]):
+              problems.append(f"A recipe called **{name}** is already published.")
+
+          tools = sorted({label for key, label in PAID if edit.get(key)})
+          if any(v for v in (edit.get("hslSat") or []) + (edit.get("hslHue") or [])
+                 + (edit.get("hslLum") or [])):
+              tools.append("HSL")
+          if tools:
+              notes.append("Uses darkroom tools: " + ", ".join(sorted(set(tools)))
+                           + " - it will wear the DARKROOM tag.")
+
+          changed = [k for k, v in edit.items()
+                     if k not in ("filmSimulation",) and v not in (0, 1, False, None, [], "")]
+          notes.append(f"Sets {len(changed)} values on top of **{look}**.")
+
+          if problems:
+              print("### Needs a fix\n")
+              for p in problems: print(f"- {p}")
+          else:
+              print("### Looks fine\n")
+              for n in notes: print(f"- {n}")
+              print("\n**To publish it**, add the `approve` label. "
+                    "The recipe is merged into `index.json` and this issue closes itself.")
+          PY
+          gh issue comment "$NUMBER" --repo "$REPO" --body-file result.md
+          if grep -q "Needs a fix\|Cannot read" result.md; then
+            gh issue edit "$NUMBER" --repo "$REPO" --add-label "needs-fix"
+          else
+            gh issue edit "$NUMBER" --repo "$REPO" --add-label "ready"
+          fi
