@@ -54,9 +54,17 @@ jobs:
           # ranking a bigger community will want - newest, rising, votes
           # per day - needs to know WHEN, and the app ignores fields it
           # does not know.
+          # Same vocabulary as the app and the relay; anything else in
+          # the section is dropped rather than published.
+          VOCAB = {"portrait","landscape","street","night","indoor","everyday",
+                   "warm","cool","moody","soft","vivid","mono"}
+          tags = [t.strip().lower() for t in section("Tags").split(",") if t.strip()]
+          tags = [t for t in tags if t in VOCAB][:3]
+
           from datetime import date
           index["recipes"].append({
               "added": date.today().isoformat(),
+              "tags": tags,
               "name": recipe["name"],
               "author": section("Name to credit") or "anonymous",
               "note": section("What is it for?"),
