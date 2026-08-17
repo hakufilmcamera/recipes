@@ -50,7 +50,13 @@ jobs:
           index = json.load(open("index.json"))
           index["recipes"] = [r for r in index["recipes"]
                               if r["name"].lower() != recipe["name"].lower()]
+          # Stamped now because it cannot be backfilled later: every
+          # ranking a bigger community will want - newest, rising, votes
+          # per day - needs to know WHEN, and the app ignores fields it
+          # does not know.
+          from datetime import date
           index["recipes"].append({
+              "added": date.today().isoformat(),
               "name": recipe["name"],
               "author": section("Name to credit") or "anonymous",
               "note": section("What is it for?"),

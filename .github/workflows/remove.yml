@@ -1,0 +1,78 @@
+# Unpublishing is adding a label, exactly as publishing is - the `remove`
+# label on the recipe's own submission issue, from the GitHub app, on a
+# phone. Deleting the ISSUE never unpublished anything: the issue is the
+# review queue and index.json is the database, and the mismatch is
+# invisible - a recipe once stayed live for days pointing at a deleted
+# issue.
+#
+# Copies already added to someone's book keep rendering, by design: the
+# index is the shelf, not the licence.
+name: Remove a published recipe
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        if: github.event.label.name == 'remove'
+      - name: Remove from the index
+        if: github.event.label.name == 'remove'
+        env:
+          BODY: ${{ github.event.issue.body }}
+          NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+
+          number = int(os.environ["NUMBER"])
+          body = os.environ["BODY"]
+
+          # The issue number is the durable link; the name in the JSON block
+          # is the fallback for entries published before issues were stamped.
+          name = None
+          m = re.search(r"```(?:json)?\s*(.+?)```", body, re.S)
+          if m:
+              try:
+                  recipe = json.loads(m.group(1))
+                  if isinstance(recipe, list): recipe = recipe[0]
+                  name = recipe.get("name")
+              except Exception:
+                  pass
+
+          index = json.load(open("index.json"))
+          before = len(index["recipes"])
+          index["recipes"] = [
+              r for r in index["recipes"]
+              if r.get("issue") != number
+              and not (name and r["name"].lower() == name.lower())
+          ]
+          assert len(index["recipes"]) < before, "nothing in the index matches this issue"
+          json.dump(index, open("index.json", "w"), indent=2)
+
+          # Its tally goes with it, so a resubmission starts at zero rather
+          # than inheriting votes cast for something that was pulled.
+          try:
+              votes = json.load(open("votes.json"))
+              gone = {r["name"] for r in json.load(open("index.json"))["recipes"]}
+              votes = {k: v for k, v in votes.items() if k in gone} if name is None else \
+                      {k: v for k, v in votes.items() if k.lower() != name.lower()}
+              json.dump(votes, open("votes.json", "w"), indent=2)
+          except FileNotFoundError:
+              pass
+          PY
+          git config user.name "hakufilmcamera"
+          git config user.email "hakufilmcamera@gmail.com"
+          git add index.json votes.json
+          git commit -m "Remove recipe from #${NUMBER}"
+          git push
+          gh issue comment "$NUMBER" --repo "$REPO" --body "Removed from the community index. Copies people already added keep working - the index is the shelf, not the licence."
