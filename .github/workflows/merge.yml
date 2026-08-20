@@ -56,8 +56,9 @@ jobs:
           # does not know.
           # Same vocabulary as the app and the relay; anything else in
           # the section is dropped rather than published.
-          VOCAB = {"portrait","landscape","street","night","indoor","everyday",
-                   "warm","cool","moody","soft","vivid","mono"}
+          VOCAB = {"portrait","landscape","street","night","indoor","everyday","travel",
+                   "warm","cool","moody","soft","vivid","mono",
+                   "vintage","faded","cinematic","golden","pastel","grainy"}
           tags = [t.strip().lower() for t in section("Tags").split(",") if t.strip()]
           tags = [t for t in tags if t in VOCAB][:3]
 
