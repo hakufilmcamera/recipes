@@ -118,6 +118,7 @@ jobs:
           # whole workflow unparseable - it could not run at all, and the
           # only symptom was a "no jobs were run" email on every push.
           gh issue comment "$NUMBER" --repo "$REPO" --body "Published - it is in the app's Community page now. Thank you. A vote for it is one tap in the app."
+          gh issue close "$NUMBER" --repo "$REPO"
       - name: Say so if it did not publish
         if: failure() && github.event.label.name == 'approve'
         env:
