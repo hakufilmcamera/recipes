@@ -60,7 +60,7 @@ jobs:
                    "warm","cool","moody","soft","vivid","mono",
                    "vintage","faded","cinematic","golden","pastel","grainy"}
           tags = [t.strip().lower() for t in section("Tags").split(",") if t.strip()]
-          tags = [t for t in tags if t in VOCAB][:3]
+          tags = [t for t in tags if t in VOCAB][:5]
 
           from datetime import date
           index["recipes"].append({
