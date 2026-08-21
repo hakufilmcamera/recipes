@@ -94,7 +94,7 @@ function one(e) {
   const shots = (e.previews || []).map(s =>
     `<img loading="lazy" src="${RAW}/previews/${esc(s)}.jpg" alt="">`).join("");
   return `
-    <p class="mark">haku</p>
+    <p class="mark"><a href="/">haku</a></p>
     <h1>${esc(e.name)}</h1>
     <p class="by">by ${esc(e.author || "anonymous")}</p>
     ${e.note ? `<p class="note">${esc(e.note)}</p>` : ""}
@@ -113,7 +113,7 @@ function one(e) {
 }
 
 function all(list) {
-  return `<p class="mark">haku</p><h1>Community recipes</h1>
+  return `<p class="mark"><a href="/">haku</a></p><h1>Community recipes</h1>
     <p class="by">${list.length} shared by the people who made them.</p>
     <div class="list">` +
     list.map(e => `<a href="#${slug(e.name)}"><div class="n">${esc(e.name)}</div>
