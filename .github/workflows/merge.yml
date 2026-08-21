@@ -45,7 +45,17 @@ jobs:
           recipe = json.loads(re.search(r"```(?:json)?\s*(.+?)```", body, re.S).group(1))
           if isinstance(recipe, list): recipe = recipe[0]
           look = recipe["edit"]["filmSimulation"]
-          assert look in BUNDLED, f"{look} is not bundled - refusing to publish"
+          # The look rule, matching the relay and validate.yml since the
+          # imported-look widening (2026-08-18): bundled needs nothing,
+          # Fujifilm's own needs nothing (the app opens the importer),
+          # anything else needs the download link the submitter supplied.
+          FUJI = {"provia","velvia","astia","classicchrome","classicneg",
+                  "pronegstd","eterna","eternableachbypass","realaace","acros"}
+          norm = lambda t: re.sub(r"[^a-z0-9]", "", (t or "").lower())
+          download = section("Download")
+          if look not in BUNDLED and norm(look) not in FUJI:
+              assert download.startswith("https://"), \
+                  f"{look} is not bundled and no download link was supplied"
 
           index = json.load(open("index.json"))
           index["recipes"] = [r for r in index["recipes"]
@@ -62,8 +72,27 @@ jobs:
           tags = [t.strip().lower() for t in section("Tags").split(",") if t.strip()]
           tags = [t for t in tags if t in VOCAB][:5]
 
+          # The author's own photographs, staged in pending/ by the relay
+          # so the issue could show them. Publishing moves them across;
+          # only the SLUG is recorded, so moving the repository or putting
+          # a CDN in front of it does not orphan every entry.
+          m = re.search(r"<!--\s*preview:\s*([^>]+?)-->", body)
+          slugs = m.group(1).split() if m else []
+          m = re.search(r"<!--\s*strengths:\s*([^>]+?)-->", body)
+          levels = [int(v) for v in m.group(1).split()] if m else []
+          levels = levels[:len(slugs)]
+          moved = []
+          for slug in slugs:
+              src, dst = f"pending/{slug}.jpg", f"previews/{slug}.jpg"
+              if os.path.exists(src):
+                  os.makedirs("previews", exist_ok=True)
+                  os.replace(src, dst)
+                  moved.append(slug)
+              elif os.path.exists(dst):
+                  moved.append(slug)
+
           from datetime import date
-          index["recipes"].append({
+          entry = {
               "added": date.today().isoformat(),
               "tags": tags,
               "name": recipe["name"],
@@ -72,12 +101,16 @@ jobs:
               "recipe": recipe,
               "votes": 0,
               "issue": int(os.environ["NUMBER"]),
-          })
+          }
+          if moved: entry["previews"] = moved
+          if levels: entry["strengths"] = levels
+          if download.startswith("https://"): entry["lutURL"] = download
+          index["recipes"].append(entry)
           json.dump(index, open("index.json", "w"), indent=2)
           PY
           git config user.name "hakufilmcamera"
           git config user.email "hakufilmcamera@gmail.com"
-          git add index.json
+          git add -A index.json pending previews
           git commit -m "Publish recipe from #${NUMBER}"
           git push
           # One line: a multi-line body here put its continuation at column
@@ -85,3 +118,12 @@ jobs:
           # whole workflow unparseable - it could not run at all, and the
           # only symptom was a "no jobs were run" email on every push.
           gh issue comment "$NUMBER" --repo "$REPO" --body "Published - it is in the app's Community page now. Thank you. A vote for it is one tap in the app."
+      - name: Say so if it did not publish
+        if: failure() && github.event.label.name == 'approve'
+        env:
+          NUMBER: ${{ github.event.issue.number }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue comment "$NUMBER" --repo "$REPO" --body "Approving did not publish this - the run failed: $RUN. The issue stays open; remove and re-add the \`approve\` label to try again once it is fixed."
