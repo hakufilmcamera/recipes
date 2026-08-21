@@ -109,7 +109,7 @@ function one(e) {
       ${e.lutURL ? `This one uses an imported film look: <a href="${esc(e.lutURL)}">download it</a>.` : ""}
       <br><br><a href="/recipes/">All recipes</a>
       ${e.issue ? ` &middot; <a href="https://github.com/hakufilmcamera/recipes/issues/${e.issue}">Vote on GitHub</a>` : ""}
-    </p>`;
+      <br><br>Haku is an independent app, not affiliated with or endorsed by any film manufacturer. Film stock names are trademarks of their owners and are used descriptively.</p>`;
 }
 
 function all(list) {
@@ -120,7 +120,7 @@ function all(list) {
       <div class="s">${esc(e.author || "anonymous")} &middot;
       ${esc(e.recipe.edit.filmSimulation || "")}</div></a>`).join("") +
     `</div><p class="foot" style="margin-top:22px">
-      These are film recipes for Haku, a camera app for iPhone.</p>`;
+      These are film recipes for Haku, a camera app for iPhone.<br><br>Haku is an independent app, not affiliated with or endorsed by any film manufacturer. Film stock names are trademarks of their owners and are used descriptively.</p>`;
 }
 
 async function render() {
