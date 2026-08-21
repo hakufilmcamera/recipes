@@ -39,6 +39,8 @@
   .cta { display: block; text-align: center; text-decoration: none;
          background: var(--amber); color: #fff; font-weight: 600;
          padding: 14px; border-radius: 12px; margin: 0 0 10px; }
+  .cta.alt { background: transparent; color: var(--amber);
+             border: 1px solid var(--line); }
   .foot { color: var(--dim); font-size: 13px; }
   .foot a { color: var(--amber); }
   .mark { font-weight: 700; letter-spacing: 2px; font-size: 13px;
@@ -99,9 +101,11 @@ function one(e) {
     ${(e.tags || []).length ? `<ul class="tags">${e.tags.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
     ${shots ? `<div class="shots">${shots}</div>` : ""}
     <div class="card">${rows(e)}</div>
-    <a class="cta" href="https://apps.apple.com/app/haku">Get Haku</a>
-    <p class="foot">Open Haku, go to Recipes &rsaquo; Community and search
-      &ldquo;${esc(e.name)}&rdquo; to add it.
+    <a class="cta" href="haku://recipe/${slug(e.name)}">Open in Haku</a>
+    <a class="cta alt" href="https://apps.apple.com/app/haku">Get Haku</a>
+    <p class="foot">The button above opens it in the app.
+      Or open Haku yourself, go to Recipes &rsaquo; Community and search
+      &ldquo;${esc(e.name)}&rdquo;.
       ${e.lutURL ? `This one uses an imported film look: <a href="${esc(e.lutURL)}">download it</a>.` : ""}
       <br><br><a href="./">All recipes</a>
       ${e.issue ? ` &middot; <a href="https://github.com/hakufilmcamera/recipes/issues/${e.issue}">Vote on GitHub</a>` : ""}
