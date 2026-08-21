@@ -52,12 +52,40 @@ jobs:
           look = edit.get("filmSimulation")
           name = recipe.get("name", "?")
 
+          # Non-bundled looks are allowed since 2026-08-18: Fujifilm's own
+          # need no link (the app opens the importer), anything else needs
+          # the download link the relay already required.
+          FUJI = {"provia","velvia","astia","classicchrome","classicneg",
+                  "pronegstd","eterna","eternableachbypass","realaace","acros"}
+          def norm(t): return re.sub(r"[^a-z0-9]", "", (t or "").lower())
           if look not in BUNDLED:
-              problems.append(f"Uses **{look}**, which is not a look Haku ships with.")
+              if norm(look) in FUJI:
+                  notes.append(f"Uses **{look}** - Fujifilm's own free simulation; recipients are sent to the importer.")
+              elif re.search(r"\*\*Download\*\*", body):
+                  notes.append(f"Uses **{look}**, an imported look - check its download link before approving.")
+              else:
+                  problems.append(f"Uses **{look}** with no download link - recipients would render ungraded.")
 
           index = json.load(open("index.json"))
           if any(r["name"].lower() == name.lower() for r in index["recipes"]):
               problems.append(f"A recipe called **{name}** is already published.")
+
+          # Film-stock trademarks cannot be the published name; a credited
+          # reference in the note is the legitimate shape. Copies of this
+          # list live in the app and the relay.
+          MARKS = {"kodak","kodachrome","portra","ektachrome","ektar",
+                   "ultramax","colorplus","vericolor","aerochrome",
+                   "cinestill","vision3","fujifilm","fujicolor","fujichrome",
+                   "superia","velvia","provia","astia","acros","eterna",
+                   "ilford","agfa","polaroid","instax"}
+          PHRASES = ["classic chrome","classic neg","nostalgic neg","reala ace"]
+          low = name.lower()
+          mark = next((p for p in PHRASES if p in low), None) \
+              or next((w for w in re.split(r"[^a-z0-9]+", low) if w in MARKS), None)
+          if mark:
+              problems.append(f"The name carries the trademark **{mark}** - "
+                              "rename before publishing; a credited reference "
+                              "belongs in the note.")
 
           tools = sorted({label for key, label in PAID if edit.get(key)})
           if any(v for v in (edit.get("hslSat") or []) + (edit.get("hslHue") or [])
