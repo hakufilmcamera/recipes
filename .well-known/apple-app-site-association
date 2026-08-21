@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["8RHUFDFG97.ca.leemail.haku"],
+        "components": [
+          { "/": "/recipes/*", "comment": "a shared community recipe" }
+        ]
+      }
+    ]
+  }
+}
