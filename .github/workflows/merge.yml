@@ -110,7 +110,7 @@ jobs:
           PY
           git config user.name "hakufilmcamera"
           git config user.email "hakufilmcamera@gmail.com"
-          git add -A index.json pending previews
+          git add -A
           git commit -m "Publish recipe from #${NUMBER}"
           git push
           # One line: a multi-line body here put its continuation at column
