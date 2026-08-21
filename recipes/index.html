@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Haku recipes</title>
+<meta name="description" content="Film recipes for Haku, shared by the people who made them.">
+<meta property="og:title" content="A Haku film recipe">
+<meta property="og:description" content="Open it in Haku, or see what it looks like.">
+<style>
+  :root {
+    --ink: #16150f; --dim: #6d6a5e; --line: #e3e0d6;
+    --paper: #f7f5ef; --card: #fff; --amber: #b8860b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #f0eee6; --dim: #9d998c; --line: #2c2a24;
+            --paper: #14130f; --card: #1c1a15; --amber: #e0aa33; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 28px 18px 60px; }
+  h1 { font-size: 30px; margin: 0 0 4px; letter-spacing: -0.4px; }
+  .by { color: var(--dim); margin: 0 0 18px; }
+  .note { font-size: 17px; margin: 0 0 22px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; padding: 0; list-style: none; }
+  .tags li { font-size: 11px; font-weight: 600; letter-spacing: .5px;
+             padding: 5px 10px; border: 1px solid var(--line); border-radius: 99px;
+             color: var(--dim); text-transform: uppercase; }
+  .shots { display: grid; gap: 8px; margin: 0 0 26px; }
+  .shots img { width: 100%; border-radius: 12px; display: block; background: var(--line); }
+  .card { background: var(--card); border: 1px solid var(--line);
+          border-radius: 14px; padding: 4px 16px; margin: 0 0 22px; }
+  .row { display: flex; justify-content: space-between; gap: 16px;
+         padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .row:last-child { border-bottom: 0; }
+  .row span:first-child { color: var(--dim); }
+  .row span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .cta { display: block; text-align: center; text-decoration: none;
+         background: var(--amber); color: #fff; font-weight: 600;
+         padding: 14px; border-radius: 12px; margin: 0 0 10px; }
+  .cta.alt { background: transparent; color: var(--amber);
+             border: 1px solid var(--line); }
+  .foot { color: var(--dim); font-size: 13px; }
+  .foot a { color: var(--amber); }
+  .mark { font-weight: 700; letter-spacing: 2px; font-size: 13px;
+          color: var(--dim); text-transform: lowercase; margin: 0 0 26px; }
+  .list a { display: block; text-decoration: none; color: inherit;
+            padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .list a:last-child { border-bottom: 0; }
+  .list .n { font-weight: 600; }
+  .list .s { color: var(--dim); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p class="foot">Loading…</p></div>
+<script>
+// One definition of the slug, mirrored in Community.slug(for:) in the app -
+// a link is only shareable if both ends agree on it.
+function slug(name) {
+  return name.toLowerCase().replace(/['’]/g, "")
+             .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+const esc = s => String(s ?? "").replace(/[<>&"]/g,
+  c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+const RAW = "https://raw.githubusercontent.com/hakufilmcamera/recipes/main";
+
+function rows(e) {
+  const d = e.recipe.edit || {}, out = [];
+  const add = (k, v) => out.push(`<div class="row"><span>${k}</span><span>${esc(v)}</span></div>`);
+  add("Film look", d.filmSimulation ?? "-");
+  if ((d.filmSimulationStrength ?? 1) < 0.999)
+    add("Strength", Math.round(d.filmSimulationStrength * 100) + "%");
+  const maybe = [
+    ["Exposure", d.exposureStops, v => (v > 0 ? "+" : "") + v.toFixed(2) + " EV"],
+    ["Temperature", d.temperatureK, v => v + "K", 5500],
+    ["Tint", d.tint, v => (v > 0 ? "+" : "") + v.toFixed(2)],
+    ["Contrast", d.contrast, v => v.toFixed(2), 1],
+    ["Saturation", d.saturation, v => v.toFixed(2), 1],
+    ["Highlights", d.highlights, v => v.toFixed(2)],
+    ["Shadows", d.shadows, v => v.toFixed(2)],
+    ["Grain", d.grain, v => v.toFixed(2)],
+    ["Halation", d.halation, v => v.toFixed(2)],
+    ["Vignette", d.vignette, v => v.toFixed(2)],
+    ["Clarity", d.clarity, v => v.toFixed(2)],
+    ["Sharpness", d.sharpness, v => v.toFixed(2)],
+  ];
+  for (const [k, v, fmt, neutral = 0] of maybe)
+    if (typeof v === "number" && Math.abs(v - neutral) > 0.001) add(k, fmt(v));
+  return out.join("");
+}
+
+function one(e) {
+  const shots = (e.previews || []).map(s =>
+    `<img loading="lazy" src="${RAW}/previews/${esc(s)}.jpg" alt="">`).join("");
+  return `
+    <p class="mark">haku</p>
+    <h1>${esc(e.name)}</h1>
+    <p class="by">by ${esc(e.author || "anonymous")}</p>
+    ${e.note ? `<p class="note">${esc(e.note)}</p>` : ""}
+    ${(e.tags || []).length ? `<ul class="tags">${e.tags.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+    ${shots ? `<div class="shots">${shots}</div>` : ""}
+    <div class="card">${rows(e)}</div>
+    <a class="cta" href="haku://recipe/${slug(e.name)}">Open in Haku</a>
+    <a class="cta alt" href="https://apps.apple.com/app/haku">Get Haku</a>
+    <p class="foot">The button above opens it in the app.
+      Or open Haku yourself, go to Recipes &rsaquo; Community and search
+      &ldquo;${esc(e.name)}&rdquo;.
+      ${e.lutURL ? `This one uses an imported film look: <a href="${esc(e.lutURL)}">download it</a>.` : ""}
+      <br><br><a href="/recipes/">All recipes</a>
+      ${e.issue ? ` &middot; <a href="https://github.com/hakufilmcamera/recipes/issues/${e.issue}">Vote on GitHub</a>` : ""}
+    </p>`;
+}
+
+function all(list) {
+  return `<p class="mark">haku</p><h1>Community recipes</h1>
+    <p class="by">${list.length} shared by the people who made them.</p>
+    <div class="list">` +
+    list.map(e => `<a href="#${slug(e.name)}"><div class="n">${esc(e.name)}</div>
+      <div class="s">${esc(e.author || "anonymous")} &middot;
+      ${esc(e.recipe.edit.filmSimulation || "")}</div></a>`).join("") +
+    `</div><p class="foot" style="margin-top:22px">
+      These are film recipes for Haku, a camera app for iPhone.</p>`;
+}
+
+async function render() {
+  const app = document.getElementById("app");
+  try {
+    const r = await fetch(RAW + "/index.json", { cache: "no-cache" });
+    const list = (await r.json()).recipes || [];
+    const want = decodeURIComponent(location.hash.slice(1));
+    const hit = want && list.find(e => slug(e.name) === want);
+    app.innerHTML = hit ? one(hit) : all(list);
+    document.title = hit ? `${hit.name} - a Haku recipe` : "Haku community recipes";
+  } catch (err) {
+    app.innerHTML = `<p class="foot">Could not load the recipes just now.
+      <a href="https://github.com/hakufilmcamera/recipes">See them on GitHub</a>.</p>`;
+  }
+}
+addEventListener("hashchange", render);
+render();
+</script>
+</body>
+</html>
