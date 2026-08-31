@@ -21,3 +21,29 @@ h2 { font-size: 19px; margin: 30px 0 8px; }
         border-top: 1px solid var(--line); padding-top: 16px; }
 
 .foot + .foot { margin-top: 6px; }
+/* ---- product page ---- */
+.wrap.wide { max-width: 880px; }
+.hero { display: flex; gap: 24px; align-items: flex-start; margin: 6px 0 30px; }
+.appicon { border-radius: 27px; flex-shrink: 0;
+           box-shadow: 0 6px 24px rgba(0,0,0,0.18); }
+.ctas { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+.btn { display: inline-block; background: var(--amber); color: var(--paper);
+       font-weight: 600; text-decoration: none; padding: 10px 22px;
+       border-radius: 999px; }
+.btn:hover { filter: brightness(1.08); }
+.small { font-size: 13px; }
+.slides { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+          margin: 8px 0 34px; }
+.slides img { width: 100%; height: auto; border-radius: 12px;
+              border: 1px solid var(--line); display: block; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 10px; }
+.card { background: var(--card); border: 1px solid var(--line);
+        border-radius: 14px; padding: 16px 18px; }
+.card h3 { margin: 0 0 6px; font-size: 16px; }
+.card p { margin: 0; font-size: 14px; color: var(--dim); }
+@media (max-width: 640px) {
+  .hero { flex-direction: column; gap: 16px; }
+  .appicon { width: 88px; height: 88px; border-radius: 20px; }
+  .slides { grid-template-columns: 1fr 1fr; }
+  .cards { grid-template-columns: 1fr; }
+}
