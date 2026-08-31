@@ -32,9 +32,11 @@ h2 { font-size: 19px; margin: 30px 0 8px; }
        border-radius: 999px; }
 .btn:hover { filter: brightness(1.08); }
 .small { font-size: 13px; }
-.slides { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-          margin: 8px 0 34px; }
-.slides img { width: 100%; height: auto; border-radius: 12px;
+.slides { display: flex; gap: 14px; margin: 8px 0 34px;
+          overflow-x: auto; scroll-snap-type: x mandatory;
+          -webkit-overflow-scrolling: touch; padding-bottom: 6px; }
+.slides img { width: 236px; height: auto; flex-shrink: 0;
+              scroll-snap-align: start; border-radius: 12px;
               border: 1px solid var(--line); display: block; }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 10px; }
 .card { background: var(--card); border: 1px solid var(--line);
@@ -44,6 +46,6 @@ h2 { font-size: 19px; margin: 30px 0 8px; }
 @media (max-width: 640px) {
   .hero { flex-direction: column; gap: 16px; }
   .appicon { width: 88px; height: 88px; border-radius: 20px; }
-  .slides { grid-template-columns: 1fr 1fr; }
+  .slides img { width: 46vw; }
   .cards { grid-template-columns: 1fr; }
 }
