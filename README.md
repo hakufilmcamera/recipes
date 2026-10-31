@@ -8,7 +8,7 @@ image data and no colour data.
 ## The one rule
 
 **Community recipes use only the looks Haku ships with**: Linen, Dune,
-Slate, Pewter, Lichen, Harbour, Ember, Kingfisher and Ink. A recipe built on
+Slate, Pewter, Lichen, Harbour, Cine, Ember, Kingfisher and Ink. A recipe built on
 an imported look would render wrong for everyone who lacks the file it
 names, so submissions naming anything else are declined - the app filters
 them out regardless.

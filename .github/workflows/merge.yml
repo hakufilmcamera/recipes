@@ -33,7 +33,7 @@ jobs:
           import json, os, re
 
           BUNDLED = {"Linen","Dune","Slate","Pewter","Lichen",
-                     "Harbour","Ember","Kingfisher","Ink"}
+                     "Harbour","Cine","Ember","Kingfisher","Ink"}
           body = os.environ["BODY"]
 
           def section(label):
