@@ -76,12 +76,18 @@
   .nav .pill { text-shadow: none; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 99px;
                background: var(--snow); color: var(--night); text-decoration: none; }
   .nav a { white-space: nowrap; }
+  /* Narrow screens keep every section in the bar (the folded Duo is about
+     460pt wide and lost Looks and Darkroom to an earlier rule that hid
+     them under 720): the type tightens and "iPhone Duo" becomes "Duo"
+     first, and only the narrowest phones let the two optional links go. */
   @media (max-width: 720px) {
-    .nav a.link.opt { display: none; }
-    .nav { padding-left: 16px; gap: 2px; }
+    .nav { padding-left: 16px; gap: 0; }
     .nav .brand { letter-spacing: .24em; font-size: 15px; }
-    .nav a.link { padding: 7px 8px; }
+    .nav a.link { padding: 7px 7px; font-size: 12.5px; }
+    .nav .pill { padding: 7px 12px; font-size: 12.5px; }
   }
+  @media (max-width: 520px) { .nav .long { display: none; } }
+  @media (max-width: 400px) { .nav a.link.opt { display: none; } }
 
   /* ---------- Type ---------- */
   .eyebrow { font: 500 14px var(--display); letter-spacing: .28em; text-transform: uppercase;
@@ -392,7 +398,7 @@
 <nav class="nav glass" aria-label="Haku">
   <a class="brand" href="/">Haku</a>
   <a class="link opt" href="#looks">Looks</a>
-  <a class="link" href="#duo">iPhone Duo</a>
+  <a class="link" href="#duo"><span class="long">iPhone </span>Duo</a>
   <a class="link opt" href="#darkroom">Darkroom</a>
   <a class="link" href="/recipes/">Recipes</a>
   <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get Haku</a>
@@ -720,7 +726,7 @@
       <div class="glass reveal d1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>
         <h4>Always adding</h4>
-        <p>Haku keeps growing, with new looks, tools and layouts arriving in regular updates. Ask for
+        <p>Haku keeps growing, with new tools and improvements arriving in regular updates. Ask for
           something, and what people ask for decides what we build next.</p>
       </div>
       <div class="glass reveal">
