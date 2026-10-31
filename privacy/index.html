@@ -2,16 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Haku — Privacy Policy</title>
 <meta name="description" content="Haku collects nothing. The full privacy policy.">
-<link rel="stylesheet" href="/shared.css?v=3">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="icon" href="/assets/icon.png">
+<link rel="apple-touch-icon" href="/assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared.css?v=6">
 </head>
 <body>
-<div class="wrap">
-  <p class="mark"><a href="/">haku</a></p>
-  <h1>Haku — Privacy Policy</h1>
-  <p><em>Effective 2026-08-26</em></p>
+<nav class="nav glass" aria-label="Haku">
+  <a class="brand" href="/">Haku</a>
+  <a class="link opt" href="/#looks">Looks</a>
+  <a class="link opt" href="/#duo">iPhone Duo</a>
+  <a class="link" href="/recipes/">Recipes</a>
+  <a class="link" href="/privacy/" aria-current="page">Privacy</a>
+  <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get Haku</a>
+</nav>
+<header class="masthead">
+  <p class="eyebrow">Data not collected</p>
+  <h1>Privacy Policy</h1>
+  <p class="lede">No accounts, no analytics, no advertising. Here is exactly what Haku does and does not do.</p>
+</header>
+<main class="wrap doc">
+  <p class="effective"><em>Effective 2026-08-26</em></p>
   <p>Haku is a camera app. Your photos are yours, and Haku is built so that nothing about them — or you — ever reaches us or anyone else.</p>
   <h2>What Haku collects</h2>
   <p>Nothing. Haku has no accounts, no analytics, and no advertising. The app never transmits anything about you or your photos.</p>
@@ -37,7 +54,7 @@
   <ul>
   <li><strong>Photos, videos and edits.</strong> Originals, RAW files, recordings, edit recipes and thumbnails are stored in the app&#x27;s private container on your device, in your iCloud/system Photos library if you choose a storage mode that uses it, or both. Haku never sees them anywhere else.</li>
   <li><strong>Sound.</strong> Recording a video captures audio through the microphone, which is written into that video file and nothing else. Haku does not listen at any other time, and declining the microphone permission records silent video rather than no video.</li>
-  <li><strong>Location.</strong> If you grant location access, the current location is embedded in each photo&#x27;s EXIF metadata — the same field every camera writes — so Photos can place your shots on a map. It is written into your own files and nowhere else. Decline the permission and everything else works unchanged.</li>
+  <li><strong>Location.</strong> Only if you turn on Geotag Photos (off unless you choose it, in the setup or in Settings &gt; Library) and grant location access, the current location is embedded in each photo&#x27;s EXIF metadata — the same field every camera writes — so Photos can place your shots on a map. It is written into your own files and nowhere else. Leave it off, or decline the permission, and everything else works unchanged.</li>
   <li><strong>Settings and film looks.</strong> Your preferences, custom setups, recipes and any LUT files you import are stored on your device only.</li>
   <li><strong>Home Screen widget.</strong> Haku keeps small copies (under 500 pixels) of your twelve most recent photographs, and the names of their recipes or looks, in a container shared only between Haku and its own widget, on this device - so the widget has something to show the moment you add it. Deleting a photo removes its copy. Nothing in it leaves your phone.</li>
   </ul>
@@ -51,7 +68,17 @@
   <p>If a future version of Haku ever changes any of this, this policy will change with it, and the change will be visible in the App Store listing before you update.</p>
   <h2>Contact</h2>
   <p><a href="mailto:support@hakufilmcamera.app">support@hakufilmcamera.app</a></p>
-  <p class="foot">Haku is made by Beju Consulting Inc.</p>
-</div>
+</main>
+<footer>
+  <div class="inner">
+    <p class="wordmark">Haku</p>
+    <p>Haku is made by Beju Consulting Inc.</p>
+    <div class="row">
+      <a href="/">Home</a><a href="/recipes/">Recipes</a><a href="/privacy/">Privacy Policy</a>
+      <a href="mailto:support@hakufilmcamera.app">Support</a>
+    </div>
+  </div>
+</footer>
+<script src="/nav.js?v=1" defer></script>
 </body>
 </html>

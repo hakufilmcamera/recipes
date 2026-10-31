@@ -2,103 +2,977 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Haku — a film camera for iPhone</title>
-<meta name="description" content="Haku is a camera app for iPhone: real manual dials, film simulations, and non-destructive editing.">
-<meta property="og:title" content="Haku">
-<meta property="og:description" content="A film camera, not a filter.">
-<meta property="og:image" content="https://hakufilmcamera.app/assets/01-classic.jpg">
+<meta name="description" content="Haku is a film camera for iPhone and iPhone Duo: ten film looks, real camera bodies, and an editor where nothing is ever baked in.">
+<meta property="og:title" content="Haku — a film camera, not a filter">
+<meta property="og:description" content="Ten film looks, three camera bodies, and an editor where nothing is ever baked in. Made for iPhone and iPhone Duo.">
+<meta property="og:image" content="https://hakufilmcamera.app/assets/duo-open-camera.webp">
+<meta name="theme-color" content="#0b0b0c">
 <link rel="icon" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
-<link rel="stylesheet" href="/shared.css?v=3">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #0b0b0c; --night-2: #151517; --paper: #f5f5f7; --white: #fff;
+    --ink: #1d1d1f; --ink-dim: #6e6e73; --snow: #f5f5f7; --snow-dim: #a1a1a6;
+    --amber: #f5b335; --amber-deep: #b8860b; --orange: #ff5a1f;
+    --display: Futura, "Futura PT", Jost, "Avenir Next", system-ui, sans-serif;
+    --text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --gutter: max(22px, env(safe-area-inset-left));
+    --ease: cubic-bezier(.22, .8, .24, 1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--night); color: var(--snow);
+         font: 17px/1.47 var(--text); letter-spacing: -0.022em;
+         -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; }
+
+  /* ---------- Liquid glass ---------- */
+  .glass {
+    position: relative; isolation: isolate;
+    background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 -1px 0 rgba(255,255,255,.06),
+                0 8px 32px rgba(0,0,0,.22);
+  }
+  .glass::before {           /* the specular sheen along the top edge */
+    content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1;
+    background: radial-gradient(120% 60% at 30% -10%, rgba(255,255,255,.28), transparent 55%);
+    pointer-events: none;
+  }
+  .glass.light {
+    background: linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.45));
+    border-color: rgba(255,255,255,.7);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 8px 30px rgba(0,0,0,.08);
+    color: var(--ink);
+  }
+
+  /* ---------- Navigation ---------- */
+  .nav.glass { background: linear-gradient(135deg, rgba(38,38,42,.14), rgba(22,22,24,.08)); color: var(--snow);
+               -webkit-backdrop-filter: blur(8px) saturate(170%); backdrop-filter: blur(8px) saturate(170%);
+               text-shadow: 0 1px 8px rgba(0,0,0,.35); }
+  /* Over a light section the bar turns to light glass with dark type, as
+     Apple's own does; the script below sets .over-light. */
+  .nav.glass { transition: background .3s, color .3s; }
+  .nav.glass.over-light { background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.12));
+                          color: var(--ink); text-shadow: none; border-color: rgba(0,0,0,.08); }
+  .nav.over-light .pill { background: var(--ink); color: var(--snow); }
+  .nav { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 50;
+         width: min(980px, calc(100% - 24px)); border-radius: 22px;
+         display: flex; align-items: center; gap: 6px; padding: 7px 7px 7px 20px; }
+  .nav .brand { font: 500 17px var(--display); letter-spacing: .32em; text-transform: uppercase;
+                text-decoration: none; margin-right: auto; }
+  .nav a.link { font-size: 13px; text-decoration: none; opacity: .82; padding: 7px 11px;
+                border-radius: 99px; transition: opacity .2s, background .2s; }
+  .nav a.link:hover { opacity: 1; background: rgba(255,255,255,.1); }
+  .nav .pill { text-shadow: none; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 99px;
+               background: var(--snow); color: var(--night); text-decoration: none; }
+  .nav a { white-space: nowrap; }
+  @media (max-width: 720px) {
+    .nav a.link.opt { display: none; }
+    .nav { padding-left: 16px; gap: 2px; }
+    .nav .brand { letter-spacing: .24em; font-size: 15px; }
+    .nav a.link { padding: 7px 8px; }
+  }
+
+  /* ---------- Type ---------- */
+  .eyebrow { font: 500 14px var(--display); letter-spacing: .28em; text-transform: uppercase;
+             color: var(--amber); margin: 0 0 14px; }
+  .headline { font: 400 clamp(32px, 8.6vw, 88px)/1.02 var(--display); letter-spacing: .01em;
+              text-transform: uppercase; margin: 0; }
+  .headline.m { font-size: clamp(34px, 5.6vw, 64px); }
+  .lede { font-size: clamp(19px, 2.1vw, 24px); line-height: 1.38; color: var(--snow-dim);
+          max-width: 640px; margin: 22px auto 0; letter-spacing: -0.01em; }
+  .light-sec .lede, .light-sec .dim { color: var(--ink-dim); }
+  .center { text-align: center; }
+  .dim { color: var(--snow-dim); }
+
+  /* ---------- Sections ---------- */
+  section { position: relative; padding: 140px var(--gutter); overflow: hidden; }
+  .inner { max-width: 1180px; margin: 0 auto; position: relative; }
+  .light-sec { background: var(--paper); color: var(--ink); }
+  .white-sec { background: var(--white); color: var(--ink); }
+  .photo-bg { position: absolute; inset: 0; background-size: cover; background-position: center;
+              z-index: 0; }
+  .photo-bg::after { content: ""; position: absolute; inset: 0;
+                     background: linear-gradient(180deg, rgba(11,11,12,.35), rgba(11,11,12,.15) 40%, rgba(11,11,12,.85)); }
+  .photo-bg + .inner { z-index: 1; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding-top: 150px; padding-bottom: 120px; min-height: 100vh; }
+  .hero .photo-bg { background-image: url(/assets/bg-dusk.jpg); }
+  .why { background: radial-gradient(80% 90% at 50% 0%, #1d1a16 0%, var(--night) 70%); color: var(--snow);
+         padding-top: 120px; padding-bottom: 120px; }
+  .why .lede { max-width: 700px; }
+  /* ---------- Carousel demo (in the Darkroom) ---------- */
+  .carousel-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-top: 110px; }
+  .carousel-demo h3 { font: 400 clamp(30px, 3.8vw, 46px)/1.06 var(--display); text-transform: uppercase; margin: 0 0 18px; }
+  .carousel-demo p { font-size: 19px; margin: 0; }
+  .carousel-demo figure { margin: 0; }
+  /* The strip is the composer's canvas: four 4:5 slides side by side
+     (site_assets.carousel_strip). */
+  .ig { position: relative; width: min(400px, 100%); margin: 0 auto; border-radius: 14px; overflow: hidden;
+        background: #000; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+  .ig-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+              aspect-ratio: 4 / 5; outline: none; }
+  .ig-track::-webkit-scrollbar { display: none; }
+  .ig-slide { flex: 0 0 100%; scroll-snap-align: start; background-image: url(/assets/carousel-strip.jpg?v=3);
+              background-size: 400% 100%; background-position: calc(var(--i) * 100% / 3) 0; }
+  .ig-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%;
+              color: #fff; font: 400 22px/1 var(--text); display: grid; place-items: center; cursor: pointer; padding: 0 0 3px; }
+  .ig-arrow.prev { left: 10px; } .ig-arrow.next { right: 10px; }
+  .ig-arrow[disabled] { opacity: 0; pointer-events: none; }
+  .ig-dots { display: flex; gap: 6px; justify-content: center; margin: 14px 0 8px; }
+  .ig-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.3); transition: background .2s; }
+  .ig-dots i.on { background: var(--amber); }
+  @media (max-width: 820px) { .carousel-demo { grid-template-columns: 1fr; gap: 40px; } }
+  .steps { list-style: none; padding: 0; margin: 56px auto 0; max-width: 900px;
+           display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; text-align: left; }
+  .steps li { border-radius: 24px; padding: 22px 22px 24px; font-size: 15px; line-height: 1.45; color: var(--snow-dim); }
+  .steps span { display: block; font: 500 12px var(--display); letter-spacing: .24em; color: var(--amber); margin-bottom: 14px; }
+  .steps b { display: block; font: 500 20px var(--display); letter-spacing: .04em; text-transform: uppercase;
+             color: var(--snow); margin-bottom: 6px; }
+  @media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+  .ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 34px; }
+  .btn { display: inline-flex; align-items: center; gap: 9px; padding: 14px 24px; border-radius: 99px;
+         font-size: 17px; font-weight: 500; text-decoration: none; transition: transform .3s var(--ease); }
+  .btn:hover { transform: scale(1.03); }
+  .btn.solid { background: var(--snow); color: var(--night); }
+  .btn svg { width: 18px; height: 18px; }
+  .hero .phone { width: min(360px, 74vw); margin: 70px auto 0; }
+  .glance { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 980px; margin: 64px auto 0;
+            border-radius: 26px; overflow: hidden; text-align: left; }
+  .glance div { padding: 22px 24px; font-size: 14px; line-height: 1.4; color: rgba(245,245,247,.78); }
+  .glance div + div { border-left: 1px solid rgba(255,255,255,.12); }
+  .glance b { display: block; font: 500 12px var(--display); letter-spacing: .2em; text-transform: uppercase;
+              color: var(--amber); margin-bottom: 6px; }
+  @media (max-width: 820px) {
+    .glance { grid-template-columns: 1fr 1fr; }
+    .glance div:nth-child(3) { border-left: 0; }
+    .glance div:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.12); }
+  }
+
+  /* ---------- Looks ---------- */
+  .looks-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 44px auto 0; max-width: 820px; }
+  .look { font: 500 13px var(--display); letter-spacing: .22em; text-transform: uppercase;
+          padding: 11px 18px; border-radius: 99px; }
+  /* The look pills: liquid glass for a light page - translucent, a crisp
+     lit edge on top and a faint one below, and only a hairline of shadow,
+     so they read as glass resting on the page rather than cards hovering
+     over it. The chosen one is the same glass, smoked. */
+  button.look.glass { font: 500 13px var(--display); cursor: pointer;
+    background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.34));
+    border: 1px solid rgba(0,0,0,.07);
+    -webkit-backdrop-filter: blur(14px) saturate(180%); backdrop-filter: blur(14px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(0,0,0,.025), 0 1px 2px rgba(0,0,0,.05);
+    transition: background .25s, color .25s, box-shadow .25s, border-color .25s; }
+  button.look.glass::before { background: radial-gradient(90% 70% at 50% -20%, rgba(255,255,255,.55), transparent 60%); }
+  button.look.glass:hover { background: linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.5)); }
+  button.look:focus-visible { outline: 2px solid var(--amber-deep); outline-offset: 3px; }
+  button.look.glass.on { color: var(--snow); border-color: rgba(255,255,255,.1);
+    background: linear-gradient(180deg, rgba(44,44,48,.9), rgba(22,22,24,.86));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 1px 3px rgba(0,0,0,.18); }
+  button.look.glass.on::before { background: radial-gradient(90% 70% at 50% -20%, rgba(255,255,255,.14), transparent 60%); }
+  .viewer { position: relative; width: min(520px, 100%); margin: 48px auto 0; }
+  .viewer .frame { position: relative; border-radius: 28px; overflow: hidden; aspect-ratio: 3 / 4; background: #ddd; }
+  .viewer .frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* Strength is the look laid over the untouched photograph at the
+     slider's opacity - the app's own blend (HakuGrade.metal, lutMix). */
+  .viewer .frame { --s: 1; }
+  .viewer .frame img.shown { opacity: var(--s); }
+  .viewer .frame img.next { opacity: 0; transition: opacity .45s var(--ease); }
+  .viewer .frame img.next.in { opacity: var(--s); }
+  .viewer .strength { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px;
+                      border-top: 1px solid rgba(0,0,0,.1); }
+  .viewer .strength label { font: 500 11px var(--display); letter-spacing: .2em; text-transform: uppercase; }
+  .viewer .strength output { font: 500 14px var(--text); font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+  .viewer input[type=range] { flex: 1; -webkit-appearance: none; appearance: none; height: 28px; background: transparent; margin: 0; cursor: pointer; }
+  .viewer input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--ink) var(--p, 100%), rgba(0,0,0,.16) var(--p, 100%)); }
+  .viewer input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(0,0,0,.16); }
+  .viewer input[type=range]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--ink); }
+  .viewer input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 38px; height: 24px; margin-top: -10px;
+    border-radius: 12px; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.28), 0 0 0 .5px rgba(0,0,0,.08); }
+  .viewer input[type=range]::-moz-range-thumb { width: 38px; height: 24px; border: 0; border-radius: 12px;
+    background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.28); }
+  .viewer input[type=range]:focus-visible { outline: 2px solid var(--amber-deep); outline-offset: 4px; border-radius: 4px; }
+  .viewer figcaption { position: absolute; left: 14px; right: 14px; bottom: 14px; border-radius: 20px;
+                       padding: 14px 18px; font-size: 14px; line-height: 1.4; }
+  .viewer figcaption b { display: block; font: 500 12px var(--display); letter-spacing: .24em;
+                         text-transform: uppercase; color: var(--amber-deep); margin-bottom: 3px; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .split.flip > :first-child { order: 2; }
+  .split .phone { width: min(360px, 100%); margin: 0 auto; }
+  /* The strength phone, live. The screenshot's slider, readout and caption
+     were taken out of the image (site_assets.py, LIVE_BANDS) and are drawn
+     here in the same places, so dragging it does what it does in the app.
+     Every position is the capture's pixel through Apple's bezel: left is
+     (72 + x) / 1350 and top is (69 + y) / 2760; sizes are capture pixels
+     over 1350 in container widths. */
+  .live-phone { position: relative; container-type: inline-size; }
+  .live-phone > img { display: block; width: 100%; height: auto; }
+  .live-phone .vf { position: absolute; left: 10.889%; top: 17.210%; width: 78.222%; height: 51.014%; overflow: hidden; --s: 1; }
+  .live-phone .vf img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .live-phone .vf .look-l { opacity: var(--s); }
+  .live-phone .step { position: absolute; top: 86.232%; width: 7.111%; height: 3.478%; border-radius: 50%;
+                      background: transparent; border: 0; color: transparent; cursor: pointer; padding: 0; }
+  .live-phone .step.minus { left: 11.852%; } .live-phone .step.plus { left: 80.963%; }
+  .live-phone .step:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+  .live-phone .pslider { position: absolute; left: 21.185%; width: 57.481%; top: 85.525%; height: 5%; margin: 0;
+                         -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; --p: 100%; }
+  .live-phone .pslider::-webkit-slider-runnable-track { height: 1.185cqw; border-radius: 1cqw;
+    background: linear-gradient(90deg, #0a84ff var(--p), rgba(120,120,128,.36) var(--p)); }
+  .live-phone .pslider::-moz-range-track { height: 1.185cqw; border-radius: 1cqw; background: rgba(120,120,128,.36); }
+  .live-phone .pslider::-moz-range-progress { height: 1.185cqw; border-radius: 1cqw; background: #0a84ff; }
+  .live-phone .pslider::-webkit-slider-thumb { -webkit-appearance: none; width: 7.70cqw; height: 4.96cqw;
+    margin-top: -1.887cqw; border-radius: 2.48cqw; background: #fff; box-shadow: 0 .3cqw 1.2cqw rgba(0,0,0,.22); }
+  .live-phone .pslider::-moz-range-thumb { width: 7.70cqw; height: 4.96cqw; border: 0; border-radius: 2.48cqw;
+    background: #fff; box-shadow: 0 .3cqw 1.2cqw rgba(0,0,0,.22); }
+  .live-phone .pslider:focus-visible { outline: 2px solid #0a84ff; outline-offset: 3px; border-radius: 4px; }
+  .live-phone .pct { position: absolute; right: 12.148%; top: 84.05%; font: 400 2.52cqw/1.2 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+                     color: rgba(255,255,255,.66); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+  .live-phone .pcap { position: absolute; left: 12.074%; right: 11%; top: 90.35%; margin: 0;
+                      font: 400 2.52cqw/1.25 -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+                      color: rgba(255,255,255,.64); letter-spacing: 0; }
+  .split h3 { font: 400 clamp(30px, 3.8vw, 46px)/1.06 var(--display); text-transform: uppercase; margin: 0 0 18px; }
+  .split p { font-size: 19px; margin: 0 0 16px; }
+  @media (max-width: 820px) { .split { grid-template-columns: 1fr; gap: 40px; } .split.flip > :first-child { order: 0; } }
+
+  /* ---------- Duo ---------- */
+  .duo { background: radial-gradient(90% 60% at 50% 0%, #26221c 0%, var(--night) 70%); }
+  .duo-hero { margin: 64px auto 0; width: min(1080px, 100%); }
+  .badge { display: inline-flex; gap: 8px; align-items: center; border-radius: 99px; padding: 8px 16px;
+           font-size: 13px; margin-bottom: 26px; }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
+             box-shadow: 0 0 10px var(--orange); }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 3vw, 40px);
+          max-width: 860px; margin: 110px auto 0; }
+  .trio figure { margin: 0; text-align: center; }
+  .trio figcaption, .cap { font: 500 12px var(--display); letter-spacing: .24em; text-transform: uppercase;
+                           color: var(--snow-dim); margin-top: 18px; }
+  .light-sec .cap, .white-sec .cap { color: var(--ink-dim); }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 110px; }
+  .fact { border-radius: 26px; padding: 30px 28px; }
+  .fact h4 { font: 400 22px/1.15 var(--display); text-transform: uppercase; margin: 0 0 10px; letter-spacing: .02em; }
+  .fact p { margin: 0; font-size: 16px; color: var(--snow-dim); }
+  @media (max-width: 820px) { .facts { grid-template-columns: 1fr; } }
+  .outer { margin: 120px auto 0; }
+
+  /* ---------- Editor ---------- */
+  .editor .photo-bg { background-image: url(/assets/bg-house.jpg); }
+  /* One physical scale: Apple's bezels are drawn at each screen's own
+     pixels and both screens are ~460 ppi, so the bezel widths (iPhone 17 Pro
+     1350, the upright Duo 2247) are the devices' true ratio. */
+  .editor .stage { display: grid; grid-template-columns: 1350fr 2247fr; gap: clamp(20px, 5vw, 70px);
+                   max-width: 900px; margin: 70px auto 0; align-items: end; }
+  .note { border-radius: 24px; padding: 22px 24px; margin-top: 26px; font-size: 16px; }
+  .note b { font-weight: 600; }
+  /* On a phone the iPhone column is ~110px: the notes would be a tower of words. */
+  @media (max-width: 620px) { .editor .note { display: none; } }
+
+  /* ---------- Bento ---------- */
+  .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 64px; }
+  .tile { border-radius: 30px; padding: 40px 36px 0; overflow: hidden; background: var(--white);
+          display: flex; flex-direction: column; }
+  .tile.dark { background: var(--night-2); color: var(--snow); }
+  .tile h4 { font: 400 26px/1.1 var(--display); text-transform: uppercase; margin: 0 0 10px; }
+  .tile p { margin: 0 0 30px; font-size: 16px; color: var(--ink-dim); }
+  .tile.dark p { color: var(--snow-dim); }
+  .tile { padding-bottom: 40px; }
+  .tile .peek { width: min(210px, 70%); margin: auto auto 0; }   /* whole device, one size: never cropped */
+  .tile.text { padding-bottom: 40px; justify-content: center; }
+  .tile ul { list-style: none; padding: 0; margin: 0; font-size: 15px; }
+  .tile li { padding: 9px 0; border-bottom: 1px solid rgba(0,0,0,.08); break-inside: avoid; }
+  .tile.dark li { border-color: rgba(255,255,255,.1); }
+  @media (max-width: 900px) { .bento { grid-template-columns: 1fr; } .tile ul { columns: 1; } }
+
+  /* ---------- The Darkroom: the app's card, on the web ---------- */
+  .darkroom { color: var(--snow);
+              background: radial-gradient(70% 55% at 92% -4%, rgba(250,13,8,.42), transparent 70%),
+                          linear-gradient(rgba(140,8,5,.12), rgba(140,8,5,.12)), #1a0404; }
+  .darkroom .lede { color: rgba(255,225,215,.7); }
+  .line { position: relative; height: 112px; margin: 70px calc(-1 * var(--gutter)) 6px; overflow: hidden;
+          cursor: grab; touch-action: pan-y;
+          -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+                  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+  .line:active { cursor: grabbing; }
+  .line .wire { position: absolute; left: 0; right: 0; top: 8px; height: 1px; background: rgba(255,255,255,.22); }
+  .line .prints { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
+  .print { position: absolute; top: 3px; width: 104px; transform-origin: 50% 0; }
+  .print .peg { width: 7px; height: 15px; margin: 0 auto; border-radius: 1.5px; background: #b88c57; }
+  .print .paper { margin-top: -3px; padding: 5px; height: 78px; background: #f0e6d6;
+                  box-shadow: 0 3px 6px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 4px; }
+  .print .img { flex: 1; background: #2b2421; display: grid; place-items: center; color: rgba(255,255,255,.88); }
+  .print .img svg { width: 20px; height: 20px; }
+  .print .tick { font: 600 7.4px var(--text); letter-spacing: .04em; text-transform: uppercase; color: #403330;
+                 text-align: center; white-space: nowrap; overflow: hidden; }
+  .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 54px; }
+  .tool { border-radius: 20px; padding: 18px 20px; display: grid; grid-template-columns: 26px 1fr; gap: 4px 14px;
+          background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.09); }
+  .tool svg { width: 22px; height: 22px; color: #f2bf33; grid-row: span 2; margin-top: 2px; }
+  .tool b { font-weight: 600; font-size: 15px; }
+  .tool span { font-size: 14px; color: rgba(255,225,215,.62); line-height: 1.4; }
+  .darkroom .tile.dark { background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.08); }
+  .small-note { font-size: 13px; color: rgba(255,225,215,.5); margin: 34px 0 0; }
+
+  /* ---------- Bodies ---------- */
+  .bodies { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 3vw, 44px);
+            max-width: 980px; margin: 70px auto 0; }
+  .bodies figure { margin: 0; text-align: center; }
+  .bodies p { font-size: 15px; margin: 8px auto 0; max-width: 260px; }
+  @media (max-width: 720px) {
+    .bodies { grid-template-columns: repeat(3, 72%); overflow-x: auto; scroll-snap-type: x mandatory;
+              padding-bottom: 12px; margin-right: calc(-1 * var(--gutter)); }
+    .bodies figure { scroll-snap-align: center; }
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 64px; }
+  .gallery figure { margin: 0; position: relative; border-radius: 22px; overflow: hidden; }
+  .gallery img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; transition: transform 1.2s var(--ease); }
+  .gallery figure:hover img { transform: scale(1.04); }
+  .gallery figcaption { position: absolute; left: 14px; bottom: 14px; border-radius: 99px; padding: 7px 14px;
+                        font: 500 11px var(--display); letter-spacing: .22em; text-transform: uppercase; color: var(--snow); }
+  @media (max-width: 720px) {
+    .gallery { grid-template-columns: repeat(3, 78%); overflow-x: auto; scroll-snap-type: x mandatory;
+               margin-right: calc(-1 * var(--gutter)); }
+    .gallery figure { scroll-snap-align: start; }
+  }
+
+  /* ---------- Privacy ---------- */
+  .privacy-card { border-radius: 36px; padding: clamp(40px, 7vw, 80px); text-align: center; max-width: 900px; margin: 0 auto; }
+  .privacy-card .big { font: 400 clamp(36px, 6vw, 68px)/1 var(--display); text-transform: uppercase; margin: 0 0 22px; }
+  .privacy-card .icon { width: 64px; height: 64px; margin: 0 auto 26px; color: var(--amber); }
+
+  /* ---------- Footer ---------- */
+  footer { background: var(--paper); color: var(--ink-dim); font-size: 12px; line-height: 1.5;
+           padding: 40px var(--gutter) 60px; }
+  footer .inner { max-width: 980px; }
+  footer .row { display: flex; flex-wrap: wrap; gap: 8px 22px; padding: 16px 0; border-top: 1px solid #d2d2d7; }
+  footer .row a { text-decoration: none; color: var(--ink); }
+  footer .row a:hover { text-decoration: underline; }
+  footer p { margin: 0 0 10px; }
+  footer .wordmark { font: 500 15px var(--display); letter-spacing: .32em; text-transform: uppercase;
+                     color: var(--ink); margin: 0 0 18px; }
+
+  /* ---------- Motion ---------- */
+  .js .reveal { opacity: 0; transform: translateY(40px) scale(.985);
+            transition: opacity 1s var(--ease), transform 1.2s var(--ease); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; } .reveal.d3 { transition-delay: .24s; }
+  @media (prefers-reduced-motion: reduce) {
+    .js .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass { background: rgba(40,40,44,.92); } .glass.light { background: rgba(255,255,255,.95); }
+  }
+</style>
 </head>
 <body>
-<div class="wrap wide">
-  <p class="mark">haku</p>
 
-  <div class="hero">
-    <img class="appicon" src="/assets/icon.png" alt="" width="120" height="120">
-    <div>
-      <h1>A film camera, not a filter</h1>
-      <p class="dim">Haku is a camera app for iPhone. Real manual dials, film
-      simulations applied through a proper colour pipeline, and editing that
-      never touches your original.</p>
-      <p class="ctas">
-        <a class="btn" href="https://testflight.apple.com/join/Hw6nSAq9">Join the beta</a>
-        <span class="dim small">Free on TestFlight while Haku is in beta.</span>
-      </p>
+<nav class="nav glass" aria-label="Haku">
+  <a class="brand" href="/">Haku</a>
+  <a class="link opt" href="#looks">Looks</a>
+  <a class="link" href="#duo">iPhone Duo</a>
+  <a class="link opt" href="#darkroom">Darkroom</a>
+  <a class="link" href="/recipes/">Recipes</a>
+  <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get Haku</a>
+</nav>
+
+<main>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="photo-bg" aria-hidden="true"></div>
+  <div class="inner center">
+    <p class="eyebrow reveal">Haku film camera</p>
+    <h1 class="headline reveal d1">A film camera,<br>not a filter.</h1>
+    <p class="lede reveal d2">Haku grades every frame the way a film camera does: before the look, not over it.
+      Ten film looks, real camera bodies, and an editor where nothing is ever baked in.</p>
+    <div class="ctas reveal d3">
+      <a class="btn solid" href="https://testflight.apple.com/join/Hw6nSAq9">Join the beta</a>
+      <a class="btn glass" href="/recipes/">Browse recipes</a>
+    </div>
+    <img class="phone reveal" src="/assets/iphone-classic.webp" width="760" height="1554"
+         alt="Haku's Classic body on iPhone, a house at dusk in the viewfinder">
+    <div class="glance glass reveal">
+      <div><b>Ten film looks</b>Authored in-house, free at any strength</div>
+      <div><b>Apple ProRAW</b>On iPhones that support it, developed in any look</div>
+      <div><b>Non-destructive</b>The original is always kept</div>
+      <div><b>Data not collected</b>No accounts, no analytics</div>
     </div>
   </div>
+</section>
 
-  <div class="slides" aria-label="Screenshots">
-    <img src="/assets/01-classic.jpg" alt="The Classic body: a viewfinder with real dials on a camera top plate" loading="lazy" width="900" height="1955">
-    <img src="/assets/02-look-strength.jpg" alt="Easing a film look's strength back against the live picture" loading="lazy" width="900" height="1955">
-    <img src="/assets/03-editor-film.jpg" alt="The editor with the film strip open over a photograph" loading="lazy" width="900" height="1955">
-    <img src="/assets/04-field.jpg" alt="The Field body: a small grey instrument with keycaps" loading="lazy" width="900" height="1955">
-    <img src="/assets/05-modern-drawer.jpg" alt="The Modern body with its control drawer open" loading="lazy" width="900" height="1955">
-    <img src="/assets/06-darkroom.jpg" alt="The Darkroom: prints developing on a wire under a safelight" loading="lazy" width="900" height="1955">
-    <img src="/assets/07-community.jpg" alt="Community recipes, each shown on the author's own photographs" loading="lazy" width="900" height="1955">
-    <img src="/assets/08-finish.jpg" alt="Print finishes: paper, edges and a date stamp" loading="lazy" width="900" height="1955">
-    <img src="/assets/09-video.jpg" alt="Video with the same film looks, trimmed and graded" loading="lazy" width="900" height="1955">
-    <img src="/assets/10-more.jpg" alt="Long exposures, clones and contact sheets" loading="lazy" width="900" height="1955">
+<!-- Why it looks different -->
+<section id="why" class="why">
+  <div class="inner center">
+    <p class="eyebrow reveal">Why it looks different</p>
+    <h2 class="headline m reveal d1">Not the iPhone look,<br>with a filter on top.</h2>
+    <p class="lede reveal d2">Every iPhone photo goes through Apple's tone curve, which is why they all look
+      alike. Haku keeps Apple's noise reduction and detail, then undoes the curve, turns the picture into the
+      log signal film looks are built for, and grades it there. Shoot ProRAW, and Apple's curve is never
+      applied at all.</p>
+    <ol class="steps">
+      <li class="glass reveal"><span>01</span><b>Kept</b>Apple's multi-frame detail and noise reduction.</li>
+      <li class="glass reveal d1"><span>02</span><b>Undone</b>The tone curve that gives every iPhone photo the same look.</li>
+      <li class="glass reveal d2"><span>03</span><b>Graded in log</b>The look applied where film looks are made to work.</li>
+    </ol>
   </div>
+</section>
 
-  <div class="cards">
-    <div class="card">
-      <h3>The looks</h3>
-      <p>Nine film looks authored from measured curves ship with the app, and
-      the importer opens the film simulation LUTs Fujifilm publishes free —
-      or any other F&#8209;Log2 cube.</p>
+<!-- Looks -->
+<section id="looks" class="light-sec">
+  <div class="inner">
+    <div class="center">
+      <p class="eyebrow reveal" style="color: var(--amber-deep)">Film looks</p>
+      <h2 class="headline m reveal d1">Ten looks.<br>And any you import.</h2>
+      <p class="lede reveal d2">Each look is authored from measured colour science, and Haku converts the
+        picture into a log film space before it is applied — so it lands like film, not like a preset.</p>
+      <div class="looks-row reveal d3" role="radiogroup" aria-label="Try a look on the photograph">
+        <button type="button" class="look glass light on" role="radio" aria-checked="true" data-look="linen">Linen</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="dune">Dune</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="slate">Slate</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="pewter">Pewter</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="lichen">Lichen</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="harbour">Harbour</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="cine">Cine</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="ember">Ember</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="kingfisher">Kingfisher</button>
+        <button type="button" class="look glass light" role="radio" aria-checked="false" data-look="ink">Ink</button>
+      </div>
     </div>
-    <div class="card">
-      <h3>Real dials</h3>
-      <p>ISO, shutter, focus, white balance and exposure compensation, each
-      with a manual override — plus a histogram, waveform, zebras and a
-      highlight-weighted meter.</p>
-    </div>
-    <div class="card">
-      <h3>Hold anything to learn it</h3>
-      <p>Every control explains itself on a long press — what it does, and
-      when you would reach for it. No manual, no hunting through menus.</p>
-    </div>
-    <div class="card">
-      <h3>Nothing is baked in</h3>
-      <p>Every photograph is the original plus a recipe. Change the look, the
-      crop or the grain months later — the negative is always underneath.</p>
-    </div>
-    <div class="card">
-      <h3>Fujifilm recipes, pasted</h3>
-      <p>Copy any X&#8209;series recipe from the web and Haku translates it
-      into its own dials — with constants calibrated against frames from a
-      real Fujifilm camera.</p>
-    </div>
-    <div class="card">
-      <h3>Beyond one press</h3>
-      <p>Long exposures, multiple exposure with CLONE, 48&nbsp;MP ProRAW,
-      contact sheets and carousels — a darkroom in the camera.</p>
+    <figure class="viewer reveal">
+      <div class="frame">
+        <img class="orig" src="/assets/looks/original.jpg?v=2" width="750" height="1000" alt="" aria-hidden="true">
+        <img class="shown" src="/assets/looks/linen.jpg?v=2" width="750" height="1000"
+             alt="Snapdragons in a pot by a sunlit window, in Linen">
+        <img class="next" alt="" aria-hidden="true" width="750" height="1000">
+      </div>
+      <figcaption class="glass light">
+        <div class="about" aria-live="polite"><b>Linen</b><span>Warm, low-contrast portrait negative. Muted colour with a distinctly warm cast, wide latitude, and shadows left open.</span></div>
+        <div class="strength">
+          <label for="strength">Strength</label>
+          <input id="strength" type="range" min="0" max="100" step="1" value="100">
+          <output for="strength">100%</output>
+        </div>
+      </figcaption>
+    </figure>
+    <p class="cap center" style="margin-top: 20px">One photograph, ten looks — rendered through the same colour pipeline as the app</p>
+    <div class="split" style="margin-top: 100px">
+      <div class="phone live-phone reveal">
+        <img src="/assets/iphone-looks-live.webp" width="760" height="1554" loading="lazy"
+             alt="Haku's Field body with Linen's sheet open over a plate of crudo">
+        <div class="vf" aria-hidden="true">
+          <img src="/assets/strength/original.jpg?v=1" width="750" height="1000" loading="lazy" alt="">
+          <img class="look-l" src="/assets/strength/linen.jpg?v=1" width="750" height="1000" loading="lazy" alt="">
+        </div>
+        <button type="button" class="step minus" aria-label="Less of the look">−</button>
+        <input class="pslider" type="range" min="0" max="100" step="1" value="100" aria-label="Linen strength">
+        <button type="button" class="step plus" aria-label="More of the look">+</button>
+        <output class="pct">100%</output>
+        <p class="pcap">Full strength, as the look was authored.</p>
+      </div>
+      <div class="reveal d1">
+        <h3>Strength,<br>by the percent.</h3>
+        <p class="dim">Dial any look from a whisper to full. Haku also opens the free film simulation LUTs
+          Fujifilm publishes, and any other F-Log2 <code>.cube</code> you bring.</p>
+        <p class="dim">Change your mind tomorrow. A look is a recipe laid over the original, never pressed into it.</p>
+      </div>
     </div>
   </div>
+</section>
 
-  <h2>Recipes</h2>
-  <p>A recipe is a whole look saved under a name — the film simulation with the
-  grain, tone and white balance that finish it. People share theirs, and you can
-  browse them all:</p>
-  <p><a href="/recipes/">Community recipes &rsaquo;</a></p>
+<!-- Duo -->
+<section id="duo" class="duo">
+  <div class="inner center">
+    <span class="badge glass reveal"><i></i>Made for iPhone Duo</span>
+    <h2 class="headline m reveal d1">Open it.<br>The whole camera is there.</h2>
+    <p class="lede reveal d2">Unfold iPhone Duo and Haku spreads out: the frame, every key, every look,
+      and your roll running underneath as a strip of negative.</p>
+    <img class="duo-hero reveal d2" src="/assets/duo-open-camera.webp?v=2" width="2000" height="1453" loading="lazy"
+         alt="Haku's Field body on an open iPhone Duo">
 
-  <h2>Support</h2>
-  <p>Something wrong, or something missing? Email
-  <a href="mailto:support@hakufilmcamera.app">support@hakufilmcamera.app</a>.
-  If the app crashed, Settings &rsaquo; About in Haku fills in the build and
-  device for you, which is most of what a fix needs.</p>
+    <h3 class="headline m reveal" style="margin-top: 140px">Fold it.<br>A pocket camera.</h3>
+    <p class="lede reveal d1">Closed, each body becomes a rail beside the frame, with the controls right where
+      your thumb already is. Open it again and nothing moves.</p>
+    <div class="trio">
+      <figure class="reveal"><img src="/assets/duo-closed-classic.webp" width="640" height="892" loading="lazy"
+        alt="Classic body on the folded iPhone Duo"><figcaption>Classic</figcaption></figure>
+      <figure class="reveal d1"><img src="/assets/duo-closed-field.webp" width="640" height="892" loading="lazy"
+        alt="Field body on the folded iPhone Duo"><figcaption>Field</figcaption></figure>
+      <figure class="reveal d2"><img src="/assets/duo-closed-modern.webp" width="640" height="892" loading="lazy"
+        alt="Modern body on the folded iPhone Duo"><figcaption>Modern</figcaption></figure>
+    </div>
 
-  <h2>Privacy</h2>
-  <p>Haku has no accounts, no analytics and no advertising, and your photos
-  never leave your phone unless you send them somewhere yourself.
-  <a href="/privacy/">The full policy</a> says exactly what the app does and
-  does not do.</p>
+    <h3 class="headline m reveal" style="margin-top: 140px">Your subject<br>sees the shot.</h3>
+    <p class="lede reveal d1">Duo Preview puts the graded frame on the outer screen, so the person you are
+      photographing sees what you see. Or turn on Kid Cue: something bright, so a child looks at the lens.</p>
+    <img class="outer reveal d2" src="/assets/duo-outer.webp" width="1400" height="1005" loading="lazy"
+         style="width: min(760px, 100%)" alt="The back of an open iPhone Duo, its outer screen showing the portrait being taken">
 
-  <p class="foot">Haku is made by Beju Consulting Inc.</p>
-  <p class="foot">Haku is an independent app, not affiliated with or endorsed by any film manufacturer. Film stock names are trademarks of their owners and are used descriptively.</p>
-</div>
+    <div class="facts">
+      <div class="fact glass reveal"><h4>Every pose</h4><p>Folded, open wide, or held upright — each has its own layout, and controls keep their place between them.</p></div>
+      <div class="fact glass reveal d1"><h4>Split at the hinge</h4><p>Editor, recipes, looks and settings use both halves: the picture on one side, every tool on the other.</p></div>
+      <div class="fact glass reveal d2"><h4>One app</h4><p>The same Haku runs on every iPhone. On Duo, the layout follows the screen you are holding.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Editor -->
+<section id="editor" class="editor">
+  <div class="photo-bg" aria-hidden="true"></div>
+  <div class="inner center">
+    <p class="eyebrow reveal">The editor</p>
+    <h2 class="headline m reveal d1">Nothing is<br>ever baked in.</h2>
+    <p class="lede reveal d2" style="color: rgba(245,245,247,.82)">The photograph fills the screen and the tools float over it on glass.
+      Hold a slider and everything else steps aside — just the picture and the one thing you are changing.</p>
+    <div class="stage">
+      <div class="reveal">
+        <img src="/assets/iphone-editor.webp?v=2" width="760" height="1554" loading="lazy"
+             alt="Haku's immersive editor on iPhone, a cat on a pebble beach in Linen at full strength">
+        <div class="note glass"><b>Tap the photo</b> and it is only the picture.</div>
+      </div>
+      <div class="reveal d1">
+        <img src="/assets/duo-upright-editor.webp" width="1000" height="1377" loading="lazy"
+             alt="Haku's immersive editor on an upright open iPhone Duo">
+        <div class="note glass"><b>Your original stays untouched.</b> Every edit is a recipe you can change, copy or undo, forever.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Darkroom -->
+<section id="darkroom" class="darkroom">
+  <div class="inner">
+    <div class="center">
+      <p class="eyebrow reveal">The Darkroom</p>
+      <h2 class="headline m reveal d1">Finish it<br>like film.</h2>
+      <p class="lede reveal d2">Seventeen tools for after the shot. Pay once and own them, or subscribe
+        monthly. No account, and nothing leaves your phone.</p>
+    </div>
+    <div class="line reveal" aria-hidden="true"><div class="wire"></div><div class="prints"></div></div>
+    <p class="cap center reveal" style="color: rgba(255,220,210,.55)">Drag the line</p>
+    <div class="tools" id="tools"></div>
+    <div class="bento">
+      <div class="tile dark reveal">
+        <h4>Colour, film's way</h4>
+        <p>White balance on the R/B grid film recipes are written in, HSL eight bands deep, and the point curve.</p>
+        <img class="peek" src="/assets/iphone-colour.webp" width="760" height="1554" loading="lazy" alt="Colour tools in Haku's editor">
+      </div>
+      <div class="tile dark reveal d1">
+        <h4>A print, not a preset</h4>
+        <p>Torn proof edges, paper, dust, a date stamp, a true fisheye — drawn, never baked in.</p>
+        <img class="peek" src="/assets/iphone-print.webp" width="760" height="1554" loading="lazy" alt="Print tools in Haku's editor">
+      </div>
+      <div class="tile dark reveal d2">
+        <h4>Contact sheets</h4>
+        <p>Your frames on 35mm, a lab proof or medium format, drawn down to the sprockets and the edge printing.</p>
+        <img class="peek" src="/assets/iphone-contact.webp" width="760" height="1554" loading="lazy" alt="A contact sheet made in Haku">
+      </div>
+    </div>
+
+    <!-- Carousels: the composer's own canvas, cut into its four slides,
+         swiped the way Instagram shows them. -->
+    <div class="carousel-demo">
+      <div class="reveal">
+        <h3>Carousels that<br>cross the cut.</h3>
+        <p class="dim">Lay your photos across a strip of Instagram slides, with a picture spanning the
+          cut between two, so the post reads as one image as people swipe. Pick the photos, drag them
+          into place, export the slides. Swipe this one.</p>
+      </div>
+      <figure class="reveal d1">
+        <div class="ig" aria-roledescription="carousel" aria-label="A four-slide carousel made in Haku">
+          <div class="ig-track" tabindex="0">
+            <div class="ig-slide" style="--i:0" role="group" aria-label="Slide 1 of 4"></div>
+            <div class="ig-slide" style="--i:1" role="group" aria-label="Slide 2 of 4"></div>
+            <div class="ig-slide" style="--i:2" role="group" aria-label="Slide 3 of 4"></div>
+            <div class="ig-slide" style="--i:3" role="group" aria-label="Slide 4 of 4"></div>
+          </div>
+          <button class="ig-arrow prev glass" type="button" aria-label="Previous slide">‹</button>
+          <button class="ig-arrow next glass" type="button" aria-label="Next slide">›</button>
+        </div>
+        <div class="ig-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+        <figcaption class="cap center">Made in Haku's composer on the iPhone Duo</figcaption>
+      </figure>
+    </div>
+
+    <p class="small-note center reveal">Photos you have already edited keep rendering exactly as they are, always.
+      Apple ProRAW needs an iPhone that supports it.</p>
+  </div>
+</section>
+
+<!-- Free -->
+<section id="free" class="light-sec">
+  <div class="inner">
+    <div class="center">
+      <p class="eyebrow reveal" style="color: var(--amber-deep)">Free, and staying that way</p>
+      <h2 class="headline m reveal d1">The whole camera<br>is free.</h2>
+      <p class="lede reveal d2">All three bodies, every lens, manual exposure and 48MP. Ten film looks at any
+        strength. The core editor, the library, recipes, and video from capture to export.</p>
+    </div>
+    <div class="bento">
+      <div class="tile dark reveal">
+        <h4>Video too</h4>
+        <p>The take stays clean. Change the look after, trim it, export it graded.</p>
+        <img class="peek" src="/assets/iphone-video.webp" width="760" height="1554" loading="lazy" alt="Haku's video editor">
+      </div>
+      <div class="tile reveal d1">
+        <h4>Recipes</h4>
+        <p>See a recipe on its author's own photographs, then put it on yours.</p>
+        <img class="peek" src="/assets/iphone-community.webp" width="760" height="1554" loading="lazy" alt="A community recipe in Haku">
+      </div>
+      <div class="tile text reveal d2">
+        <h4>And the rest</h4>
+        <ul>
+          <li>Shutter, ISO, focus and white balance by hand</li><li>Focus peaking, zebras, waveform and histogram</li>
+          <li>Highlight-weighted metering</li><li>Straighten and perspective, on three axes</li>
+          <li>Grey-card white balance</li><li>A 35mm prime mode</li>
+          <li>Opens from the Lock Screen and Camera Control</li><li>Send Nearby, phone to phone</li>
+          <li>Hold any control to learn what it does</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bodies -->
+<section id="bodies" class="white-sec">
+  <div class="inner center">
+    <p class="eyebrow reveal" style="color: var(--amber-deep)">Three bodies</p>
+    <h2 class="headline m reveal d1">Three cameras in one.</h2>
+    <p class="lede reveal d2">Classic, Field and Modern are real bodies over one camera.
+      Pick the one that fits your hands, and lose nothing.</p>
+    <div class="bodies">
+      <figure class="reveal"><img src="/assets/iphone-classic-dials.webp" width="760" height="1554" loading="lazy" alt="Classic body with its shutter, ISO and EV dials">
+        <figcaption class="cap">Classic</figcaption><p class="dim">Dials where a rangefinder keeps them.</p></figure>
+      <figure class="reveal d1"><img src="/assets/iphone-field.webp" width="760" height="1554" loading="lazy" alt="Field body">
+        <figcaption class="cap">Field</figcaption><p class="dim">Every control on a key, nothing in a menu.</p></figure>
+      <figure class="reveal d2"><img src="/assets/iphone-modern.webp?v=2" width="760" height="1554" loading="lazy" alt="Modern body, the viewfinder on a plate of crudo with the look strip under it">
+        <figcaption class="cap">Modern</figcaption><p class="dim">The frame edge to edge, the looks under your thumb.</p></figure>
+    </div>
+  </div>
+</section>
+
+<!-- Shot on Haku -->
+<section id="shot" class="duo" style="padding-bottom: 120px">
+  <div class="inner">
+    <div class="center">
+      <p class="eyebrow reveal">Shot on Haku</p>
+      <h2 class="headline m reveal d1">Straight from<br>the camera.</h2>
+    </div>
+    <div class="gallery">
+      <figure class="reveal"><img src="/assets/photo-harbour.jpg" width="1500" height="2000" loading="lazy" alt="A house at dusk with a lit window">
+        <figcaption class="glass">Harbour</figcaption></figure>
+      <figure class="reveal d1"><img src="/assets/photo-linen.jpg" width="1500" height="2000" loading="lazy" alt="Olives and a glass of beer on a marble bar">
+        <figcaption class="glass">Linen</figcaption></figure>
+      <figure class="reveal d2"><img src="/assets/photo-ink.jpg" width="1500" height="2000" loading="lazy" alt="Shadows on a pavement in black and white">
+        <figcaption class="glass">Ink</figcaption></figure>
+    </div>
+    <div class="ctas reveal">
+      <a class="btn glass" href="/recipes/">See community recipes</a>
+    </div>
+  </div>
+</section>
+
+<!-- Privacy -->
+<section id="privacy" class="light-sec">
+  <div class="inner">
+    <div class="privacy-card glass light reveal">
+      <svg class="icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true">
+        <path d="M32 6 10 14v16c0 14 9.4 24.6 22 28 12.6-3.4 22-14 22-28V14L32 6Z"/><path d="m22 32 7 7 13-14"/></svg>
+      <p class="big">Data not collected.</p>
+      <p class="lede" style="margin-top: 0">No accounts, no analytics, no advertising. Your photographs never leave
+        your phone unless you send them somewhere yourself.</p>
+      <div class="ctas"><a class="btn solid" style="background: var(--ink); color: var(--snow)" href="/privacy/">Read the privacy policy</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- Get -->
+<section id="get" class="white-sec">
+  <div class="inner center">
+    <h2 class="headline m reveal">Free to shoot.</h2>
+    <p class="lede reveal d1">The camera, all ten looks and the core editor are free. The Darkroom's
+      finishing tools are a one-time purchase. Coming to the App Store for iPhone and iPhone Duo; until then, Haku is free on TestFlight.</p>
+    <div class="ctas reveal d2"><a class="btn solid" style="background: var(--ink); color: var(--snow)" href="https://testflight.apple.com/join/Hw6nSAq9">Join the beta</a></div>
+    <p class="lede reveal d2" style="font-size: 17px">Something wrong, or something missing? Email
+      <a href="mailto:support@hakufilmcamera.app" style="color: var(--amber-deep)">support@hakufilmcamera.app</a>.
+      If the app crashed, Settings › About in Haku fills in the build and device for you.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="inner">
+    <p class="wordmark">Haku</p>
+    <p>Haku is made by Beju Consulting Inc. Haku is an independent app, not associated with the Fujifilm Corporation, or with
+      any other film or camera manufacturer. Film stock names are trademarks of their owners and are used descriptively.
+      Apple, iPhone and iPhone Duo are trademarks of Apple Inc.</p>
+    <div class="row">
+      <a href="/recipes/">Recipes</a><a href="/privacy/">Privacy Policy</a>
+      <a href="https://testflight.apple.com/join/Hw6nSAq9">TestFlight beta</a>
+      <a href="mailto:support@hakufilmcamera.app">Support</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // The bar's tint follows the section under it.
+  (function () {
+    var nav = document.querySelector('.nav'), queued = false;
+    function check() {
+      queued = false;
+      var y = nav.getBoundingClientRect().bottom - 8, light = false;
+      document.querySelectorAll('.light-sec').forEach(function (s) {
+        var r = s.getBoundingClientRect(); if (r.top <= y && r.bottom > y) light = true;
+      });
+      nav.classList.toggle('over-light', light);
+    }
+    addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(check); } }, { passive: true });
+    addEventListener('resize', check); check();
+  })();
+
+  // The looks demo: each button swaps in the same photograph rendered in
+  // that look, cross-faded, and preloads the rest once the section is near.
+  (function () {
+    var notes = {
+      linen: 'Warm, low-contrast portrait negative. Muted colour with a distinctly warm cast, wide latitude, and shadows left open.',
+      dune: 'Airy and open. Shadows barely closed, highlights running early to paper, warm sand through the middle.',
+      slate: 'Muted documentary rendering. Low saturation, a firm toe that crushes blacks by design, restrained highlights.',
+      pewter: 'Cool and distant. Desaturated and properly blue, with its structure intact - air between you and the subject.',
+      lichen: 'A roll left too long in a drawer. Very flat, blacks lifted to milk, colour drained toward olive.',
+      harbour: 'Muted, with strong tonal separation and cyan shadows. Documentary, and a little cold.',
+      cine: 'Low and filmic. Whites printed down to cream, cool deep shadows, dense muted colour and blues turned toward teal.',
+      ember: 'Late warm light. Deep amber through the midtones, shadows crushed but never neutral, highlights kept hot.',
+      kingfisher: 'Vivid transparency film. High saturation and contrast, deep blacks, built for landscape rather than skin.',
+      ink: 'Black and white, and not a desaturation: real red sensitivity, deep blacks, a long shoulder.'
+    };
+    var buttons = document.querySelectorAll('button.look');
+    var shown = document.querySelector('.viewer img.shown');
+    var next = document.querySelector('.viewer img.next');
+    var cap = document.querySelector('.viewer figcaption .about');
+    var frame = document.querySelector('.viewer .frame');
+    var range = document.getElementById('strength');
+    var readout = document.querySelector('.viewer output');
+    function strength() {
+      var v = range.value;
+      frame.style.setProperty('--s', v / 100);
+      range.style.setProperty('--p', v + '%');
+      readout.textContent = v + '%';
+    }
+    range.addEventListener('input', strength);
+
+    // The strength phone: the same blend on its own viewfinder, with the
+    // app's own captions (FilmSimulationSheet.swift) and its +/- steps.
+    var live = document.querySelector('.live-phone');
+    if (live) {
+      var pr = live.querySelector('.pslider'), vf = live.querySelector('.vf');
+      var pct = live.querySelector('.pct'), pcap = live.querySelector('.pcap');
+      var say = function (v) {
+        return v < 1 ? "Off - the camera's own rendering, ungraded."
+             : v < 50 ? 'A hint of the look, keeping most of the original colour.'
+             : v < 99 ? 'Pulled back from the full simulation.'
+             : 'Full strength, as the look was authored.';
+      };
+      var set = function (v) {
+        v = Math.max(0, Math.min(100, Math.round(v))); pr.value = v;
+        vf.style.setProperty('--s', v / 100); pr.style.setProperty('--p', v + '%');
+        pct.textContent = v + '%'; pcap.textContent = say(v);
+      };
+      pr.addEventListener('input', function () { set(+pr.value); });
+      live.querySelector('.minus').addEventListener('click', function () { set(+pr.value - 10); });
+      live.querySelector('.plus').addEventListener('click', function () { set(+pr.value + 10); });
+    }
+    if (!shown) return;
+    // Versioned: the files keep their names when the photograph changes,
+    // and a browser holding the old ones would show them (2026-10-30).
+    var src = function (k) { return '/assets/looks/' + k + '.jpg?v=2'; };
+    var token = 0;
+    function pick(btn) {
+      var k = btn.dataset.look, name = btn.textContent, mine = ++token;
+      buttons.forEach(function (b) {
+        var on = b === btn; b.classList.toggle('on', on); b.setAttribute('aria-checked', on);
+      });
+      cap.innerHTML = '<b>' + name + '</b><span>' + notes[k] + '</span>';
+      next.onload = function () {
+        if (mine !== token) return;
+        next.classList.add('in');
+        setTimeout(function () {
+          if (mine !== token) return;
+          shown.src = next.src; shown.alt = 'Snapdragons in a pot by a sunlit window, in ' + name;
+          next.classList.remove('in');
+        }, 460);
+      };
+      next.src = src(k);
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener('click', function () { pick(b); });
+      b.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        var t = buttons[(i + d + buttons.length) % buttons.length]; t.focus(); pick(t);
+      });
+    });
+    if ('IntersectionObserver' in window) {
+      var pre = new IntersectionObserver(function (es) {
+        if (!es[0].isIntersecting) return;
+        pre.disconnect();
+        buttons.forEach(function (b) { new Image().src = src(b.dataset.look); });
+      }, { rootMargin: '400px' });
+      pre.observe(shown);
+    }
+  })();
+
+  // The carousel demo: slides snap like Instagram's; the arrows and dots
+  // follow the scroll, whichever way it was moved.
+  (function () {
+    var track = document.querySelector('.ig-track');
+    if (!track) return;
+    var prev = document.querySelector('.ig-arrow.prev'), next = document.querySelector('.ig-arrow.next');
+    var dots = document.querySelectorAll('.ig-dots i'), n = dots.length;
+    function at() { return Math.round(track.scrollLeft / track.clientWidth); }
+    function sync() {
+      var i = at();
+      dots.forEach(function (d, k) { d.classList.toggle('on', k === i); });
+      prev.disabled = i <= 0; next.disabled = i >= n - 1;
+    }
+    function go(d) { track.scrollTo({ left: (at() + d) * track.clientWidth, behavior: 'smooth' }); }
+    prev.addEventListener('click', function () { go(-1); });
+    next.addEventListener('click', function () { go(1); });
+    track.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    });
+    track.addEventListener('scroll', function () { requestAnimationFrame(sync); }, { passive: true });
+    sync();
+  })();
+
+  // The Darkroom's line - the app's Settings card (DarkroomMarquee in
+  // AppearanceSheet.swift) redrawn: prints travel right to left, blank paper
+  // under the safelight at the right, developing as they cross the room;
+  // the line can be pulled. Names and lines are PaidFeature's.
+  (function () {
+    var G = {
+      looks: '<path d="M12 4v10m-4-4 4 4 4-4M5 16v3h14v-3"/>',
+      raw: '<circle cx="12" cy="12" r="8"/><path d="m12 4 3.5 6.5M20 12l-7 1.5M16 18.9 12.5 13M6 18.5l4.5-5.5M4.3 10 11 11M9 4.6 11 11"/>',
+      timer: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 3h4"/>',
+      multi: '<circle cx="7.5" cy="11" r="3"/><circle cx="12" cy="11" r="3"/><circle cx="16.5" cy="11" r="3"/><path d="M3.5 19c1-2.5 7-2.5 8.5-.5 1.5-2 7.5-2 8.5.5"/>',
+      split: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/>',
+      print: '<path d="M7 9V4h10v5M7 17H4.5v-8h15v8H17M7 14h10v6H7z"/>',
+      portrait: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="10" r="3"/><path d="M6.5 18.2c1.6-2.8 9.4-2.8 11 0"/>',
+      relight: '<path d="M13 3 6 13h5l-1 8 7-10h-5z"/>',
+      wind: '<path d="M3 9h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7"/>',
+      halation: '<circle cx="12" cy="12" r="3.5" fill="currentColor"/><circle cx="12" cy="12" r="7" opacity=".45"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2" opacity=".7"/>',
+      hsl: '<circle cx="12" cy="12" r="8"/><path d="M12 4v8l6.9 4M12 12l-6.9 4"/>',
+      curve: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M5 18c5 0 4-12 14-12"/>',
+      grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.3 4v16m5.4-16v16M4 9.3h16M4 14.7h16"/>',
+      retouch: '<circle cx="12" cy="12" r="8"/><path d="M8.5 14.5c2 2 5 2 7 0M9 10h.01M15 10h.01" stroke-linecap="round" stroke-width="2"/>',
+      selective: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>',
+      carousel: '<rect x="3" y="7" width="11" height="12" rx="1.5"/><path d="M17 7v12M20.5 9v8"/>',
+      sheet: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9h18M3 15h18M7 5v4m5-4v4m5-4v4M7 15v4m5-4v4m5-4v4"/>'
+    };
+    var F = [
+      ['looks', 'Film looks', 'Film looks, and Fujifilm recipes', "Fujifilm's own simulations, any F-Log2 cube, published recipes."],
+      ['raw', 'RAW', 'Apple ProRAW', 'Develop from the negative - 2.2 stops more highlight.'],
+      ['timer', 'Long exposure', 'Long exposure', 'Silky water and light trails, two to thirty seconds.'],
+      ['multi', 'Multiple exposure', 'Multiple exposure', 'Up to nine frames on one - or CLONE yourself into it.'],
+      ['split', 'Split tone', 'Split tone', 'Teal shadows against amber highlights, and three more pairs.'],
+      ['print', 'Print stage', 'The print stage', 'Paper, wear, edges, mats, a date stamp, a true fisheye.'],
+      ['portrait', 'Portrait', 'Portrait refocus', 'Place the focal plane after the fact.'],
+      ['relight', 'Relights', 'One-tap relights', 'Flash, Booth, Blue Hour and Backlight in one tap.'],
+      ['wind', 'Motion blur', 'Motion blur', 'A slow shutter, painted where you want it.'],
+      ['halation', 'Halation', 'Halation', 'The warm glow film gets around bright highlights.'],
+      ['hsl', 'HSL', 'HSL', 'Shift just the greens, just the sky.'],
+      ['curve', 'Curve', 'Tone curve', 'The point curve - RGB, per channel, or brightness alone.'],
+      ['grid', 'R/B grid', 'R/B shift grid', 'The R/B plane film recipes are written in.'],
+      ['retouch', 'Retouching', 'Retouching', 'Smooth skin, whiten teeth, heal a blemish.'],
+      ['selective', 'Selective', 'Selective adjust', 'Edit only what is under a point you tap.'],
+      ['carousel', 'Carousels', 'Carousels', 'One picture spanning two Instagram slides.'],
+      ['sheet', 'Contact sheets', 'Contact sheets', '35mm, lab proof or medium format sheets.']
+    ];
+    var svg = function (k) {
+      return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">' + G[k] + '</svg>';
+    };
+    var tools = document.getElementById('tools');
+    if (tools) tools.innerHTML = F.map(function (f) {
+      return '<div class="tool">' + svg(f[0]) + '<b>' + f[2] + '</b><span>' + f[3] + '</span></div>';
+    }).join('');
+
+    var line = document.querySelector('.line'), strip = line && line.querySelector('.prints');
+    if (!strip) return;
+    var STRIDE = 128, N = F.length, SPAN = N * STRIDE, LEAN = [-2.5, 1.8, -0.8];
+    var els = [];
+    for (var k = 0; k < N * 2 + 2; k++) {
+      var f = F[k % N], el = document.createElement('div');
+      el.className = 'print';
+      el.innerHTML = '<div class="peg"></div><div class="paper"><div class="img">' + svg(f[0]) +
+                     '</div><div class="tick">' + f[1] + '</div></div>';
+      strip.appendChild(el); els.push(el);
+    }
+    var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var shift = 0, last = null, drag = null, visible = true;
+    function draw() {
+      var w = line.clientWidth;
+      for (var k = 0; k < els.length; k++) {
+        var x = ((k * STRIDE - shift) % SPAN + SPAN) % SPAN - STRIDE;
+        if (x > w + STRIDE) x -= SPAN;
+        // Development is a function of position: blank paper at the right
+        // edge, fully developed two-thirds across.
+        var d = still ? 1 : Math.max(0, Math.min(1, (w - x - 20) / (w * 0.62)));
+        var g = 0.10 + 0.90 * Math.pow(d, 1.35), b = 0.06 + 0.94 * Math.pow(d, 1.35);
+        var e = els[k];
+        e.style.transform = 'translateX(' + x + 'px) rotate(' + LEAN[k % N % 3] + 'deg)';
+        e.querySelector('.img').style.background = 'rgb(' + Math.round(240 - 197 * d) + ',' + Math.round(230 - 194 * d) + ',' + Math.round(214 - 181 * d) + ')';
+        e.querySelector('.img svg').style.opacity = Math.pow(d, 1.7);
+        e.style.filter = 'url(#safelight-' + Math.round(d * 10) + ')';
+      }
+    }
+    // The safelight: a red multiply that clears as the print develops.
+    var defs = '<svg width="0" height="0" style="position:absolute"><defs>';
+    for (var i = 0; i <= 10; i++) {
+      var dd = i / 10, gg = (0.10 + 0.90 * Math.pow(dd, 1.35)).toFixed(3), bb = (0.06 + 0.94 * Math.pow(dd, 1.35)).toFixed(3);
+      defs += '<filter id="safelight-' + i + '"><feColorMatrix type="matrix" values="1 0 0 0 0  0 ' + gg + ' 0 0 0  0 0 ' + bb + ' 0 0  0 0 0 1 0"/></filter>';
+    }
+    document.body.insertAdjacentHTML('beforeend', defs + '</defs></svg>');
+    function tick(t) {
+      if (last != null && !drag && !still && visible) shift += (t - last) * 0.022;   // ~22 px a second
+      last = t; draw(); requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    line.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, s: shift }; line.setPointerCapture(e.pointerId); });
+    line.addEventListener('pointermove', function (e) { if (drag) shift = drag.s - (e.clientX - drag.x); });
+    ['pointerup', 'pointercancel'].forEach(function (n) { line.addEventListener(n, function () { drag = null; }); });
+    if ('IntersectionObserver' in window)
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(line);
+  })();
+
+  // Fade sections in as they arrive. Without script the html element never
+  // gets .js, so nothing is hidden in the first place.
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach(function (e) { e.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
 </body>
 </html>
