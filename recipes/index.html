@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/shared.css?v=6">
+<link rel="stylesheet" href="/shared.css?v=7">
 <style>
   .masthead .by { color: var(--snow-dim); margin: 14px 0 0; }
   .masthead .note { color: var(--snow); font-size: 19px; max-width: 620px; margin: 18px auto 0; }
@@ -38,21 +38,55 @@
   .cta.alt { background: transparent; color: var(--ink); border: 1px solid var(--line); }
   .small { color: var(--ink-dim); font-size: 14px; }
   .small a { color: var(--amber); }
-  .search { width: 100%; font: 17px var(--text); padding: 14px 20px; border-radius: 99px;
-            border: 1px solid var(--line); background: var(--card); color: var(--ink); margin: 0 0 22px; }
-  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .search { width: 100%; font: 16px var(--text); padding: 12px 18px; border-radius: 99px;
+            border: 1px solid var(--line); background: var(--card); color: var(--ink); margin: 0 0 12px; }
+  /* Filter by look: one row of small chips, scrolling sideways where it
+     does not fit - the same strip the homepage's looks use on a phone. */
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 0 22px; padding: 2px 0 4px; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: 0 0 auto; font: 500 11px var(--display); letter-spacing: .16em; text-transform: uppercase;
+                  padding: 8px 13px; border-radius: 99px; border: 1px solid var(--line); background: var(--card);
+                  color: var(--ink); cursor: pointer; }
+  .chips button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .count { color: var(--ink-dim); font-size: 13px; margin: -10px 0 14px; }
+  .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
   .item { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--card);
-          border: 1px solid var(--line); border-radius: 24px; overflow: hidden;
+          border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
           transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
   .item:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,.12); }
-  .item .pic { aspect-ratio: 4 / 3; background: var(--line); }
+  .item .pic { position: relative; aspect-ratio: 4 / 5; background: var(--line); }
   .item .pic img { width: 100%; height: 100%; object-fit: cover; }
+  /* No preview of its own: the recipe's look on the homepage's photograph,
+     marked as such, rather than an empty panel. */
+  .item .pic .stand { position: absolute; left: 8px; bottom: 8px; font: 500 9px var(--display); letter-spacing: .18em;
+                      text-transform: uppercase; color: #fff; background: rgba(0,0,0,.42); padding: 4px 7px; border-radius: 99px;
+                      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
   .item .pic .blank { display: flex; height: 100%; align-items: center; justify-content: center;
                       background: radial-gradient(90% 120% at 50% 0%, #2a251e 0%, var(--night) 75%);
-                      color: var(--amber-hi); font: 500 13px var(--display); letter-spacing: .3em; text-transform: uppercase; }
-  .item .txt { padding: 16px 20px 18px; }
-  .item .n { font: 400 20px/1.15 var(--display); text-transform: uppercase; letter-spacing: .02em; }
-  .item .s { color: var(--ink-dim); font-size: 14px; margin-top: 4px; }
+                      color: var(--amber-hi); font: 500 12px var(--display); letter-spacing: .3em; text-transform: uppercase; }
+  .item .txt { padding: 12px 14px 14px; }
+  .item .n { font: 400 17px/1.15 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+  .item .s { color: var(--ink-dim); font-size: 13px; margin-top: 3px; }
+  .item .go { display: none; }
+  /* A phone gets a list, not a gallery: a small picture, the name, who
+     made it and its look, so a screen holds eight recipes instead of one. */
+  @media (max-width: 600px) {
+    .wrap { padding-top: 24px; }
+    .list { grid-template-columns: 1fr; gap: 0; background: var(--card); border: 1px solid var(--line);
+            border-radius: 20px; overflow: hidden; }
+    .item { flex-direction: row; align-items: center; gap: 14px; border: 0; border-radius: 0;
+            border-bottom: 1px solid var(--line); padding: 10px 12px; background: transparent; }
+    .item:last-child { border-bottom: 0; }
+    .item:hover { transform: none; box-shadow: none; }
+    .item .pic { flex: 0 0 56px; height: 70px; aspect-ratio: auto; border-radius: 10px; overflow: hidden; }
+    .item .pic .stand { display: none; }
+    .item .pic .blank { font-size: 7px; letter-spacing: .14em; }
+    .item .txt { flex: 1; padding: 0; min-width: 0; }
+    .item .n { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item .go { display: block; color: var(--ink-dim); font-size: 20px; padding-right: 2px; }
+    .shots { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
+    .shots img { border-radius: 14px; }
+  }
   .loading { text-align: center; color: var(--ink-dim); padding: 80px 0; }
 </style>
 </head>
@@ -60,7 +94,7 @@
 <nav class="nav glass" aria-label="Haku">
   <a class="brand" href="/">Haku</a>
   <a class="link opt" href="/#looks">Looks</a>
-  <a class="link opt" href="/#duo">iPhone Duo</a>
+  <a class="link opt" href="/#duo"><span class="long">iPhone </span>Duo</a>
   <a class="link" href="/recipes/" aria-current="page">Recipes</a>
   <a class="link" href="/privacy/">Privacy</a>
   <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get Haku</a>
@@ -144,20 +178,35 @@ function one(e) {
     </main>`;
 }
 
+// The looks Haku ships, which the homepage has rendered on one photograph:
+// a recipe with no previews of its own shows its look on that instead.
+const SHIPPED = ["Linen", "Dune", "Slate", "Pewter", "Lichen", "Harbour", "Cine", "Ember", "Kingfisher", "Ink"];
+
 function all(list) {
   const cards = list.map(e => {
     const pic = (e.previews || [])[0];
-    return `<a class="item" href="#${slug(e.name)}" data-q="${esc((e.name + " " + (e.author || "") + " " + (e.recipe.edit.filmSimulation || "")).toLowerCase())}">
-      <div class="pic">${pic ? `<img loading="lazy" src="${RAW}/previews/${esc(pic)}.jpg" alt="">`
-        : `<span class="blank">${esc(e.recipe.edit.filmSimulation || "Haku")}</span>`}</div>
+    const look = e.recipe.edit.filmSimulation || "";
+    const art = pic ? `<img loading="lazy" src="${RAW}/previews/${esc(pic)}.jpg" alt="">`
+      : SHIPPED.includes(look)
+        ? `<img loading="lazy" src="/assets/looks/${look.toLowerCase()}.jpg?v=2" alt=""><span class="stand">${esc(look)} look</span>`
+        : `<span class="blank">${esc(look || "Haku")}</span>`;
+    return `<a class="item" href="#${slug(e.name)}" data-look="${esc(look)}" data-q="${esc((e.name + " " + (e.author || "") + " " + look).toLowerCase())}">
+      <div class="pic">${art}</div>
       <div class="txt"><div class="n">${esc(e.name)}</div>
-      <div class="s">${esc(e.author || "anonymous")} &middot; ${esc(e.recipe.edit.filmSimulation || "")}</div></div></a>`;
+      <div class="s">${esc(e.author || "anonymous")} &middot; ${esc(look)}</div></div>
+      <span class="go" aria-hidden="true">&rsaquo;</span></a>`;
   }).join("");
+  const looks = [...new Set(list.map(e => e.recipe.edit.filmSimulation).filter(Boolean))]
+    .sort((a, b) => (SHIPPED.indexOf(a) + 99) % 99 - (SHIPPED.indexOf(b) + 99) % 99);
+  const chips = looks.length > 1
+    ? `<div class="chips" role="group" aria-label="Filter by look"><button type="button" aria-pressed="true" data-look="">All</button>${
+        looks.map(l => `<button type="button" aria-pressed="false" data-look="${esc(l)}">${esc(l)}</button>`).join("")}</div>` : "";
   return `<header class="masthead"><p class="eyebrow">The community</p><h1>Recipes</h1>
       <p class="lede">${list.length} film recipes for Haku, shared by the people who made them.
         Open one in the app and it lands on your photographs.</p></header>
     <main class="wrap">
       <input class="search" type="search" placeholder="Search recipes, authors or looks" aria-label="Search recipes">
+      ${chips}
       <div class="list">${cards}</div>
     </main>`;
 }
@@ -173,10 +222,19 @@ async function render() {
     document.title = hit ? `${hit.name} - a Haku recipe` : "Haku community recipes";
     window.scrollTo(0, 0);
     const box = app.querySelector(".search");
-    if (box) box.addEventListener("input", () => {
+    let look = "";
+    const filter = () => {
       const q = box.value.trim().toLowerCase();
-      app.querySelectorAll(".item").forEach(a => { a.hidden = q && !a.dataset.q.includes(q); });
-    });
+      app.querySelectorAll(".item").forEach(a => {
+        a.hidden = (q && !a.dataset.q.includes(q)) || (look && a.dataset.look !== look);
+      });
+    };
+    if (box) box.addEventListener("input", filter);
+    app.querySelectorAll(".chips button").forEach(b => b.addEventListener("click", () => {
+      look = b.dataset.look;
+      app.querySelectorAll(".chips button").forEach(o => o.setAttribute("aria-pressed", o === b));
+      filter();
+    }));
   } catch (err) {
     app.innerHTML = `<header class="masthead"><p class="eyebrow">The community</p><h1>Recipes</h1></header>
       <p class="loading">Could not load the recipes just now.

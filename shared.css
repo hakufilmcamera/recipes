@@ -55,11 +55,25 @@ a { color: var(--amber); }
 .nav a.link:hover, .nav a.link[aria-current] { opacity: 1; background: rgba(255,255,255,.1); }
 .nav .pill { text-shadow: none; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 99px;
              background: var(--snow); color: var(--night); text-decoration: none; }
+/* The homepage's narrow-screen bar: every link kept down to the folded
+   Duo's 375pt, tighter type first, the optional ones gone under 340. */
 @media (max-width: 720px) {
-  .nav { padding-left: 16px; gap: 2px; }
+  .nav { padding-left: 16px; gap: 0; }
   .nav .brand { letter-spacing: .24em; font-size: 15px; }
-  .nav a.link { padding: 7px 8px; }
-  .nav a.link.opt { display: none; }
+  .nav a.link { padding: 7px 7px; font-size: 12.5px; }
+  .nav .pill { padding: 7px 12px; font-size: 12.5px; }
+}
+@media (max-width: 520px) { .nav .long { display: none; } }
+@media (max-width: 400px) {
+  .nav { padding-left: 14px; padding-right: 5px; }
+  .nav .brand { letter-spacing: .14em; font-size: 14px; }
+  .nav a.link { padding: 6px 5px; font-size: 12px; }
+  .nav .pill { padding: 6px 10px; font-size: 12px; margin-left: 3px; }
+}
+@media (max-width: 340px) { .nav a.link.opt { display: none; } }
+@media (max-width: 600px) {
+  .masthead { padding: 104px var(--gutter) 36px; }
+  .masthead .lede { font-size: 16px; margin-top: 12px; }
 }
 
 /* Page header: a dark band under the glass bar, like the homepage's hero */
