@@ -87,7 +87,16 @@
     .nav .pill { padding: 7px 12px; font-size: 12.5px; }
   }
   @media (max-width: 520px) { .nav .long { display: none; } }
-  @media (max-width: 400px) { .nav a.link.opt { display: none; } }
+  /* The folded Duo is 375pt wide, the same as a standard iPhone, so the
+     whole row has to fit there: tighter still, and only below that do the
+     two optional links go. */
+  @media (max-width: 400px) {
+    .nav { padding-left: 14px; padding-right: 5px; }
+    .nav .brand { letter-spacing: .14em; font-size: 14px; }
+    .nav a.link { padding: 6px 5px; font-size: 12px; }
+    .nav .pill { padding: 6px 10px; font-size: 12px; margin-left: 3px; }
+  }
+  @media (max-width: 340px) { .nav a.link.opt { display: none; } }
 
   /* ---------- Type ---------- */
   .eyebrow { font: 500 14px var(--display); letter-spacing: .28em; text-transform: uppercase;
