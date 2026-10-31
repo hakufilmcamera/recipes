@@ -65,6 +65,7 @@ a { color: var(--amber); }
 }
 @media (max-width: 520px) { .nav .long { display: none; } }
 @media (max-width: 400px) {
+  .nav .pill .long { display: none; }
   .nav { padding-left: 14px; padding-right: 5px; }
   .nav .brand { letter-spacing: .14em; font-size: 14px; }
   .nav a.link { padding: 6px 5px; font-size: 12px; }

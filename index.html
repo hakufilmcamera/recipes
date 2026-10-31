@@ -7,7 +7,7 @@
 <meta name="description" content="Haku is a film camera for iPhone and iPhone Duo: ten film looks, real camera bodies, and an editor where nothing is ever baked in.">
 <meta property="og:title" content="Haku — a film camera, not a filter">
 <meta property="og:description" content="Ten film looks, three camera bodies, and an editor where nothing is ever baked in. Made for iPhone and iPhone Duo.">
-<meta property="og:image" content="https://hakufilmcamera.app/assets/duo-open-camera.webp">
+<meta property="og:image" content="https://hakufilmcamera.app/assets/duo-open-camera.webp?v=3">
 <meta name="theme-color" content="#0b0b0c">
 <link rel="icon" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
@@ -90,7 +90,10 @@
   /* The folded Duo is 375pt wide, the same as a standard iPhone, so the
      whole row has to fit there: tighter still, and only below that do the
      two optional links go. */
+  /* Support joined the bar (2026-10-30): at phone width the pill says
+     "Get", as the App Store's own button does, to make room. */
   @media (max-width: 400px) {
+    .nav .pill .long { display: none; }
     .nav { padding-left: 14px; padding-right: 5px; }
     .nav .brand { letter-spacing: .14em; font-size: 14px; }
     .nav a.link { padding: 6px 5px; font-size: 12px; }
@@ -277,6 +280,29 @@
   /* ---------- Duo ---------- */
   .duo { background: radial-gradient(90% 60% at 50% 0%, #26221c 0%, var(--night) 70%); }
   .duo-hero { margin: 64px auto 0; width: min(1080px, 100%); }
+  /* The open Duo, then the folded Duo below it: Classic and Modern slide
+     out from behind Field as the row scrolls into view (the script sets
+     their transform; without it they simply stand in place). */
+  .duo { padding-top: 0; overflow: clip; }
+  /* Each part is one screen tall, as when the section was pinned, so the
+     devices take whatever height the words leave - the sizes they had. */
+  .duo-stage { display: flex; flex-direction: column; align-items: center; justify-content: center;
+               height: 100vh; height: 100svh; padding: 84px var(--gutter) 16px; text-align: center; }
+  @media (max-height: 1000px) { .duo-step .badge { display: none; } }
+  .duo-step { width: min(1100px, 100%); }
+  .duo-step .lede { max-width: 760px; margin: 16px auto 0; }
+  .duo-step .badge { margin-bottom: 18px; }
+  .duo-devices { position: relative; flex: 1 1 auto; min-height: 0; width: min(1180px, 100%); margin-top: 10px; }
+  .duo-devices .open { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .folded { flex: 1 1 auto; min-height: 0; width: min(1180px, 100%); display: flex; justify-content: center;
+            align-items: flex-start; gap: clamp(10px, 3vw, 44px); margin-top: 10px; }
+  .folded figure { margin: 0; display: flex; flex-direction: column; align-items: center; }
+  .folded .mid { position: relative; z-index: 1; }
+  .folded .side { will-change: transform, opacity; }
+  .folded img { width: auto; height: auto; max-width: 30vw; max-height: calc(var(--bh, 600px) - 30px); }
+  .folded figcaption { font: 500 12px var(--display); letter-spacing: .24em; text-transform: uppercase;
+                       color: var(--snow-dim); margin-top: 10px; }
+  @media (max-width: 600px) { .duo-step .lede { font-size: 16px; } }
   .badge { display: inline-flex; gap: 8px; align-items: center; border-radius: 99px; padding: 8px 16px;
            font-size: 13px; margin-bottom: 26px; }
   .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
@@ -423,7 +449,8 @@
   <a class="link" href="#duo"><span class="long">iPhone </span>Duo</a>
   <a class="link opt" href="#darkroom">Darkroom</a>
   <a class="link" href="/recipes/">Recipes</a>
-  <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get Haku</a>
+  <a class="link sup" href="/support/">Support</a>
+  <a class="pill" href="https://testflight.apple.com/join/Hw6nSAq9">Get<span class="long"> Haku</span></a>
 </nav>
 
 <main>
@@ -532,27 +559,39 @@
 
 <!-- Duo -->
 <section id="duo" class="duo">
-  <div class="inner center">
-    <span class="badge glass reveal"><i></i>Made for iPhone Duo</span>
-    <h2 class="headline m reveal d1">Open it.<br>The whole camera is there.</h2>
-    <p class="lede reveal d2">Unfold iPhone Duo and Haku spreads out: the frame, every key, every look,
-      and your roll running underneath as a strip of negative.</p>
-    <img class="duo-hero reveal d2" src="/assets/duo-open-camera.webp?v=2" width="2000" height="1453" loading="lazy"
-         alt="Haku's Field body on an open iPhone Duo">
-
-    <h3 class="headline m reveal" style="margin-top: 140px">Fold it.<br>A pocket camera.</h3>
-    <p class="lede reveal d1">Closed, each body becomes a rail beside the frame, with the controls right where
-      your thumb already is. Open it again and nothing moves.</p>
-    <div class="trio">
-      <figure class="reveal"><img src="/assets/duo-closed-classic.webp" width="640" height="892" loading="lazy"
+  <!-- The open Duo, then, scrolled to, the folded Duo: Field first, with
+       Classic and Modern sliding out from behind it as the row comes into
+       view. Apple's own device images, untouched. Without JavaScript the
+       three simply stand in a row. -->
+  <div class="duo-stage">
+    <div class="duo-step">
+      <span class="badge glass"><i></i>Made for iPhone Duo</span>
+      <h2 class="headline m">Open it.<br>The whole camera is there.</h2>
+      <p class="lede">The frame, every key, every look, and your roll running underneath as a strip
+        of negative.</p>
+    </div>
+    <div class="duo-devices">
+      <img class="open" src="/assets/duo-open-camera.webp?v=3" width="2000" height="1453"
+           alt="Haku's Field body on an open iPhone Duo">
+    </div>
+  </div>
+  <div class="duo-stage fold">
+    <div class="duo-step">
+      <h2 class="headline m">Fold it.<br>A pocket camera.</h2>
+      <p class="lede">Closed, each body becomes a rail beside the frame, with the controls right where
+        your thumb already is. Open it again and nothing moves.</p>
+    </div>
+    <div class="folded">
+      <figure class="side c"><img src="/assets/duo-closed-classic.webp" width="640" height="892"
         alt="Classic body on the folded iPhone Duo"><figcaption>Classic</figcaption></figure>
-      <figure class="reveal d1"><img src="/assets/duo-closed-field.webp" width="640" height="892" loading="lazy"
+      <figure class="mid"><img src="/assets/duo-closed-field.webp" width="640" height="892"
         alt="Field body on the folded iPhone Duo"><figcaption>Field</figcaption></figure>
-      <figure class="reveal d2"><img src="/assets/duo-closed-modern.webp" width="640" height="892" loading="lazy"
+      <figure class="side m"><img src="/assets/duo-closed-modern.webp" width="640" height="892"
         alt="Modern body on the folded iPhone Duo"><figcaption>Modern</figcaption></figure>
     </div>
-
-    <h3 class="headline m reveal" style="margin-top: 140px">Your subject<br>sees the shot.</h3>
+  </div>
+  <div class="inner center">
+    <h3 class="headline m reveal" style="margin-top: 60px">Your subject<br>sees the shot.</h3>
     <p class="lede reveal d1">Duo Preview puts the graded frame on the outer screen, so the person you are
       photographing sees what you see. Or turn on Kid Cue: something bright, so a child looks at the lens.</p>
     <img class="outer reveal d2" src="/assets/duo-outer.webp" width="1400" height="1005" loading="lazy"
@@ -595,11 +634,10 @@
     <div class="center">
       <p class="eyebrow reveal">The Darkroom</p>
       <h2 class="headline m reveal d1">Finish it<br>like film.</h2>
-      <p class="lede reveal d2">Seventeen tools for after the shot. Pay once and own them, or subscribe
+      <p class="lede reveal d2">Eighteen tools for after the shot. Pay once and own them, or subscribe
         monthly. No account, and nothing leaves your phone.</p>
     </div>
     <div class="line reveal" aria-hidden="true"><div class="wire"></div><div class="prints"></div></div>
-    <p class="cap center reveal" style="color: rgba(255,220,210,.55)">Drag the line</p>
     <div class="tools" id="tools"></div>
     <div class="bento">
       <div class="tile dark reveal">
@@ -785,9 +823,9 @@
     <p class="lede reveal d1">The camera, all ten looks and the core editor are free. The Darkroom's
       finishing tools are a one-time purchase. Coming to the App Store for iPhone and iPhone Duo; until then, Haku is free on TestFlight.</p>
     <div class="ctas reveal d2"><a class="btn solid" style="background: var(--ink); color: var(--snow)" href="https://testflight.apple.com/join/Hw6nSAq9">Join the beta</a></div>
-    <p class="lede reveal d2" style="font-size: 17px">Something wrong, or something missing? Email
-      <a href="mailto:support@hakufilmcamera.app" style="color: var(--amber-deep)">support@hakufilmcamera.app</a>.
-      If the app crashed, Settings › About in Haku fills in the build and device for you.</p>
+    <p class="lede reveal d2" style="font-size: 17px">Something wrong, or something missing? In Haku, Settings › About has
+      Report an issue and Suggest a feature. Guides to every tool, and answers, are on the
+      <a href="/support/" style="color: var(--amber-deep)">Support</a> page.</p>
   </div>
 </section>
 
@@ -802,7 +840,7 @@
     <div class="row">
       <a href="/recipes/">Recipes</a><a href="/privacy/">Privacy Policy</a>
       <a href="https://testflight.apple.com/join/Hw6nSAq9">TestFlight beta</a>
-      <a href="mailto:support@hakufilmcamera.app">Support</a>
+      <a href="/support/">Support</a>
     </div>
   </div>
 </footer>
@@ -921,6 +959,38 @@
     }
   })();
 
+  // The folded Duo: as the row scrolls up into view, Classic and Modern
+  // slide out from behind Field to their places.
+  (function () {
+    var row = document.querySelector('.folded');
+    if (!row) return;
+    var mid = row.querySelector('.mid'), sides = row.querySelectorAll('.side');
+    var clamp = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var ease = function (x) { return x * x * (3 - 2 * x); };
+    var queued = false;
+    function draw() {
+      queued = false;
+      row.style.setProperty('--bh', row.clientHeight + 'px');
+      // Measured on Field itself, not the row: on a phone the row is a
+      // screen tall and Field sits small at its top.
+      var r = mid.getBoundingClientRect();
+      // From Field's top at 90% of the screen to its middle at the centre.
+      var start = innerHeight * .9, end = innerHeight / 2 - r.height / 2;
+      var g = ease(clamp((start - r.top) / Math.max(1, start - end)));
+      var mx = mid.offsetLeft + mid.offsetWidth / 2;
+      sides.forEach(function (s) {
+        var dx = mx - (s.offsetLeft + s.offsetWidth / 2);
+        s.style.opacity = clamp(g * 3);
+        s.style.transform = 'translateX(' + (dx * (1 - g)) + 'px) scale(' + (.92 + .08 * g) + ')';
+        // The name only once the body is clear of Field's, or they overprint.
+        s.querySelector('figcaption').style.opacity = clamp((g - .6) / .4);
+      });
+    }
+    addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(draw); } }, { passive: true });
+    addEventListener('resize', draw);
+    draw();
+  })();
+
   // The carousel demo: slides snap like Instagram's; the arrows and dots
   // follow the scroll, whichever way it was moved.
   (function () {
@@ -951,6 +1021,7 @@
   // the line can be pulled. Names and lines are PaidFeature's.
   (function () {
     var G = {
+      roll: '<rect x="3" y="9" width="12" height="12" rx="1.5"/><path d="M7 5h12v12M11 2h10v10"/>',
       looks: '<path d="M12 4v10m-4-4 4 4 4-4M5 16v3h14v-3"/>',
       raw: '<circle cx="12" cy="12" r="8"/><path d="m12 4 3.5 6.5M20 12l-7 1.5M16 18.9 12.5 13M6 18.5l4.5-5.5M4.3 10 11 11M9 4.6 11 11"/>',
       timer: '<circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 3h4"/>',
@@ -985,6 +1056,7 @@
       ['grid', 'R/B grid', 'R/B shift grid', 'The R/B plane film recipes are written in.'],
       ['retouch', 'Retouching', 'Retouching', 'Smooth skin, whiten teeth, heal a blemish.'],
       ['selective', 'Selective', 'Selective adjust', 'Edit only what is under a point you tap.'],
+      ['roll', 'Whole roll', 'Edit a whole roll', 'One edit or recipe onto a whole roll at once.'],
       ['carousel', 'Carousels', 'Carousels', 'One picture spanning two Instagram slides.'],
       ['sheet', 'Contact sheets', 'Contact sheets', '35mm, lab proof or medium format sheets.']
     ];
