@@ -130,7 +130,7 @@ const RAW = "https://raw.githubusercontent.com/hakufilmcamera/recipes/main";
 function rows(e) {
   const d = e.recipe.edit || {}, out = [];
   const add = (k, v) => out.push(`<div class="row"><span>${k}</span><span>${esc(v)}</span></div>`);
-  add("Film look", d.filmSimulation ?? "-");
+  add("Film look", lookName(d.filmSimulation) || "-");
   if ((d.filmSimulationStrength ?? 1) < 0.999)
     add("Strength", Math.round(d.filmSimulationStrength * 100) + "%");
   const maybe = [
@@ -185,11 +185,17 @@ function one(e) {
 // The looks Haku ships, which the homepage has rendered on one photograph:
 // a recipe with no previews of its own shows its look on that instead.
 const SHIPPED = ["Linen", "Dune", "Slate", "Pewter", "Lichen", "Harbour", "Cine", "Ember", "Kingfisher", "Ink"];
+// What the page calls a recipe's look: Haku's own by name, anything else
+// (a look the author imported - often a Fujifilm simulation) as one neutral
+// phrase. The site never prints a Fujifilm simulation's name (brand.md);
+// the app tags the same recipes NEEDS LOOK.
+const IMPORTED = "Imported film look";
+const lookName = look => SHIPPED.includes(look) ? look : (look ? IMPORTED : "");
 
 function all(list) {
   const cards = list.map(e => {
     const pic = (e.previews || [])[0];
-    const look = e.recipe.edit.filmSimulation || "";
+    const look = lookName(e.recipe.edit.filmSimulation || "");
     const art = pic ? `<img loading="lazy" src="${RAW}/previews/${esc(pic)}.jpg" alt="">`
       : SHIPPED.includes(look)
         ? `<img loading="lazy" src="/assets/looks/${look.toLowerCase()}.jpg?v=2" alt=""><span class="stand">${esc(look)} look</span>`
@@ -200,7 +206,7 @@ function all(list) {
       <div class="s">${esc(e.author || "anonymous")} &middot; ${esc(look)}</div></div>
       <span class="go" aria-hidden="true">&rsaquo;</span></a>`;
   }).join("");
-  const looks = [...new Set(list.map(e => e.recipe.edit.filmSimulation).filter(Boolean))]
+  const looks = [...new Set(list.map(e => lookName(e.recipe.edit.filmSimulation)).filter(Boolean))]
     .sort((a, b) => (SHIPPED.indexOf(a) + 99) % 99 - (SHIPPED.indexOf(b) + 99) % 99);
   const chips = looks.length > 1
     ? `<div class="chips" role="group" aria-label="Filter by look"><button type="button" aria-pressed="true" data-look="">All</button>${
