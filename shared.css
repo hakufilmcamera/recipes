@@ -6,6 +6,7 @@
   --night: #0b0b0c; --paper: #f5f5f7; --white: #fff;
   --ink: #1d1d1f; --ink-dim: #6e6e73; --snow: #f5f5f7; --snow-dim: #a1a1a6;
   --line: #d2d2d7; --card: #fff; --amber: #b8860b; --amber-hi: #f5b335;
+  --kana: #B8441A;
   --display: Futura, "Futura PT", Jost, "Avenir Next", system-ui, sans-serif;
   --text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --gutter: max(22px, env(safe-area-inset-left));
@@ -13,7 +14,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root { --paper: #0b0b0c; --white: #151517; --card: #1c1c1e; --ink: #f5f5f7;
-          --ink-dim: #a1a1a6; --line: #2c2c2e; --amber: #f5b335; }
+          --ink-dim: #a1a1a6; --line: #2c2c2e; --amber: #f5b335;
+          --kana: #ED6533; }
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -22,6 +24,17 @@ body { margin: 0; background: var(--paper); color: var(--ink);
        -webkit-font-smoothing: antialiased; }
 img { display: block; max-width: 100%; height: auto; }
 a { color: var(--amber); }
+
+/* The wordmark lockup the motion pieces close on (distribution/motion/lib.js,
+   lockupLayout): the orange dot, HAKU in Archivo expanded, ハク in Noto Sans
+   JP at 0.4 of its size - the same proportions, so the site and the Reels
+   carry one mark. */
+.lockup { display: inline-flex; align-items: baseline; line-height: 1; color: inherit; }
+.lockup .dot { flex: none; width: .2em; height: .2em; border-radius: 50%; background: #ED6533;
+               margin-right: .22em; position: relative; top: -.28em; }
+.lockup .word { font: 600 1em/1 Archivo, var(--display); font-stretch: 125%; letter-spacing: .08em; }
+.lockup .kana { font: 500 .4em/1 "Noto Sans JP", "Hiragino Sans", sans-serif; letter-spacing: .02em;
+                color: var(--kana); margin-left: .45em; position: relative; top: -.05em; }
 
 /* Liquid glass */
 .glass {
@@ -49,8 +62,9 @@ a { color: var(--amber); }
 .nav.over-light { background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.12));
                   color: var(--ink); text-shadow: none; border-color: rgba(0,0,0,.08); }
 .nav.over-light .pill { background: var(--ink); color: var(--snow); }
-.nav .brand { font: 500 17px var(--display); letter-spacing: .32em; text-transform: uppercase;
-              text-decoration: none; margin-right: auto; }
+.nav { --kana: #ED6533; }
+.nav.over-light { --kana: #B8441A; }
+.nav .brand { font-size: 19px; text-decoration: none; margin-right: auto; }
 .nav a.link { font-size: 13px; text-decoration: none; opacity: .82; padding: 7px 11px; border-radius: 99px; }
 .nav a.link:hover, .nav a.link[aria-current] { opacity: 1; background: rgba(255,255,255,.1); }
 .nav .pill { text-shadow: none; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 99px;
@@ -59,16 +73,19 @@ a { color: var(--amber); }
    Duo's 375pt, tighter type first, the optional ones gone under 340. */
 @media (max-width: 720px) {
   .nav { padding-left: 16px; gap: 0; }
-  .nav .brand { letter-spacing: .24em; font-size: 15px; }
+  .nav .brand { font-size: 16px; }
   .nav a.link { padding: 7px 7px; font-size: 12.5px; }
   .nav .pill { padding: 7px 12px; font-size: 12.5px; }
 }
 @media (max-width: 520px) { .nav .long { display: none; } }
+/* The lockup is wider than the old type was: on phones ハク steps out of
+   the bar (the footer keeps it), so every link still fits. */
+@media (max-width: 459px) { .nav .brand { font-size: 12.5px; } .nav .brand .kana { display: none; } }
 @media (max-width: 400px) {
   .nav .pill .long { display: none; }
   .nav { padding-left: 14px; padding-right: 5px; }
-  .nav .brand { letter-spacing: .14em; font-size: 14px; }
-  .nav a.link { padding: 6px 5px; font-size: 12px; }
+  .nav .brand { font-size: 12px; }
+  .nav a.link { padding: 6px 4px; font-size: 12px; }
   .nav .pill { padding: 6px 10px; font-size: 12px; margin-left: 3px; }
 }
 @media (max-width: 340px) { .nav a.link.opt { display: none; } }
@@ -106,8 +123,7 @@ a { color: var(--amber); }
 footer { color: var(--ink-dim); font-size: 12px; line-height: 1.5;
          padding: 30px var(--gutter) 56px; border-top: 1px solid var(--line); }
 footer .inner { max-width: 980px; margin: 0 auto; }
-footer .wordmark { font: 500 15px var(--display); letter-spacing: .32em; text-transform: uppercase;
-                   color: var(--ink); margin: 0 0 14px; }
+footer .wordmark { font-size: 18px; color: var(--ink); margin: 0 0 16px; }
 footer p { margin: 0 0 10px; }
 footer .row { display: flex; flex-wrap: wrap; gap: 8px 22px; padding-top: 14px; border-top: 1px solid var(--line); }
 footer .row a { color: var(--ink); text-decoration: none; }
