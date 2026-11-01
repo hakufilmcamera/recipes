@@ -1,0 +1,15 @@
+# Hosts a recipe's download link may point to without a second look.
+# One per line; a line matches the host itself and any subdomain of it.
+# Everything else is flagged "check-link" on submission - not refused, just
+# looked at harder. Shared by validate.yml and link-check.yml.
+gumroad.com
+lemonsqueezy.com
+payhip.com
+etsy.com
+ko-fi.com
+patreon.com
+github.com
+gitlab.com
+dropbox.com
+drive.google.com
+icloud.com

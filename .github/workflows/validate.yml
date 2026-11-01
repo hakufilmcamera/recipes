@@ -62,7 +62,20 @@ jobs:
               if norm(look) in FUJI:
                   notes.append(f"Uses **{look}** - Fujifilm's own free simulation; recipients are sent to the importer.")
               elif re.search(r"\*\*Download\*\*", body):
-                  notes.append(f"Uses **{look}**, an imported look - check its download link before approving.")
+                  # The link's host against the trusted list; unknown hosts
+                  # are flagged for a harder look, never refused outright.
+                  from urllib.parse import urlparse
+                  dl = re.search(r"\*\*Download\*\*\s*\n+(\S+)", body)
+                  url = dl.group(1) if dl else ""
+                  host = (urlparse(url).hostname or "").lower()
+                  trusted = [l.strip().lower() for l in open(".github/trusted-hosts.txt")
+                             if l.strip() and not l.startswith("#")]
+                  known = any(host == t or host.endswith("." + t) for t in trusted)
+                  notes.append(f"Uses **{look}**, an imported look. Download link on **{host or '?'}** - "
+                               + ("a trusted host." if known else "**not a trusted host: check it harder.**")
+                               + " Before approving, follow [the checklist](https://github.com/hakufilmcamera/recipes/blob/main/REVIEWING.md).")
+                  if not known:
+                      open("untrusted", "w").write(host)
               else:
                   problems.append(f"Uses **{look}** with no download link - recipients would render ungraded.")
 
@@ -113,4 +126,7 @@ jobs:
             gh issue edit "$NUMBER" --repo "$REPO" --add-label "needs-fix"
           else
             gh issue edit "$NUMBER" --repo "$REPO" --add-label "ready"
+          fi
+          if [ -f untrusted ]; then
+            gh issue edit "$NUMBER" --repo "$REPO" --add-label "check-link"
           fi

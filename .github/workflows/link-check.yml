@@ -1,0 +1,63 @@
+# Once a week, open every published recipe's download link. A link that
+# fails, or that now lands on a different site than the one approved (a
+# swapped page, a sold domain), is reported on the recipe's submission
+# issue with the `link-broken` label - so a human looks, and `remove`
+# unpublishes it if it is no longer safe. Nothing here changes the index.
+name: Check download links
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"     # Mondays, 09:17 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open every link
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, urllib.request
+          from urllib.parse import urlparse
+
+          trusted = [l.strip().lower() for l in open(".github/trusted-hosts.txt")
+                     if l.strip() and not l.startswith("#")]
+          def same_site(a, b):
+              a, b = a.lower(), b.lower()
+              return a == b or a.endswith("." + b) or b.endswith("." + a)
+
+          for r in json.load(open("index.json"))["recipes"]:
+              url = r.get("lutURL")
+              if not url: continue
+              start = urlparse(url).hostname or ""
+              problem = None
+              try:
+                  req = urllib.request.Request(url, method="GET",
+                        headers={"User-Agent": "Mozilla/5.0 (Haku recipe link check)"})
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      final = urlparse(resp.geturl()).hostname or ""
+                      if resp.status >= 400:
+                          problem = f"answered HTTP {resp.status}"
+                      elif not same_site(final, start):
+                          problem = f"now lands on **{final}**, not {start}"
+              except Exception as e:
+                  problem = f"could not be opened: `{type(e).__name__}: {str(e)[:120]}`"
+              print(r["name"], url, "->", problem or "ok")
+              if problem and r.get("issue"):
+                  body = (f"The weekly link check: **{r['name']}**'s download link "
+                          f"({url}) {problem}.\n\nOpen it and check it against "
+                          f"[the checklist](https://github.com/hakufilmcamera/recipes/blob/main/REVIEWING.md). If it is no "
+                          f"longer safe or no longer there, add the `remove` label.")
+                  subprocess.run(["gh", "issue", "comment", str(r["issue"]), "--repo",
+                                  os.environ["REPO"], "--body", body], check=False)
+                  subprocess.run(["gh", "issue", "edit", str(r["issue"]), "--repo",
+                                  os.environ["REPO"], "--add-label", "link-broken"], check=False)
+          PY
