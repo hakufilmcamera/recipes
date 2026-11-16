@@ -358,6 +358,8 @@
   .tile { padding-bottom: 40px; }
   .tile .peek { width: min(210px, 70%); margin: auto auto 0; }   /* whole device, one size: never cropped */
   .tile.text { padding-bottom: 40px; justify-content: center; }
+  /* Rows of text tiles read as a row: headings level, not centred. */
+  #library .tile.text, .darkroom .tile.text { justify-content: flex-start; }
   .tile ul { list-style: none; padding: 0; margin: 0; font-size: 15px; }
   .tile li { padding: 9px 0; border-bottom: 1px solid rgba(0,0,0,.08); break-inside: avoid; }
   .tile.dark li { border-color: rgba(255,255,255,.1); }
@@ -617,14 +619,19 @@
     </div>
   </div>
   <div class="inner center">
-    <h3 class="headline m reveal" style="margin-top: clamp(24px, 5vw, 60px)">Your subject<br>sees the shot.</h3>
+    <h3 class="headline m reveal" style="margin-top: clamp(24px, 5vw, 60px)">Stand it half-folded.<br>A waist-level camera.</h3>
+    <p class="lede reveal d1">Set the Duo down half-open and look into it the way you would a twin-lens
+      reflex: the picture on the half that lies flat, the controls on the half that stands, and two
+      instruments along the top - the look in a memo holder, a frame counter, a level or a light meter.</p>
+
+    <h3 class="headline m reveal" style="margin-top: clamp(48px, 8vw, 110px)">Your subject<br>sees the shot.</h3>
     <p class="lede reveal d1">Duo Preview puts the graded frame on the outer screen, so the person you are
       photographing sees what you see. Or turn on Kid Cue: something bright, so a child looks at the lens.</p>
     <img class="outer reveal d2" src="/assets/duo-outer.webp" width="1400" height="1005" loading="lazy"
          style="width: min(760px, 100%)" alt="The back of an open iPhone Duo, its outer screen showing the portrait being taken">
 
     <div class="facts">
-      <div class="fact glass reveal"><h4>Every pose</h4><p>Folded, open wide, or held upright — each has its own layout, and controls keep their place between them.</p></div>
+      <div class="fact glass reveal"><h4>Every pose</h4><p>Folded, open wide, held upright or stood half-folded — each has its own layout, and controls keep their place between them.</p></div>
       <div class="fact glass reveal d1"><h4>Split at the hinge</h4><p>Editor, recipes, looks and settings use both halves: the picture on one side, every tool on the other.</p></div>
       <div class="fact glass reveal d2"><h4>One app</h4><p>The same Haku runs on every iPhone. On Duo, the layout follows the screen you are holding.</p></div>
     </div>
@@ -654,13 +661,45 @@
   </div>
 </section>
 
+<!-- Library -->
+<section id="library" class="light-sec">
+  <div class="inner">
+    <div class="center">
+      <p class="eyebrow reveal" style="color: var(--amber-deep)">The library</p>
+      <h2 class="headline m reveal d1">Your photos,<br>in rolls.</h2>
+      <p class="lede reveal d2">Haku cuts your photos into rolls of film wherever the shooting stopped for a
+        while, and names each one for where it was shot. Open a roll to circle the keepers, start an album,
+        or send it to a friend.</p>
+    </div>
+    <div class="bento">
+      <div class="tile text reveal">
+        <h4>Rolls</h4>
+        <p>Each named for its place, with your circled frames first on its strip. Or load an undeveloped
+          roll and shoot without looking: the frames stay hidden until it is full, or the next morning.</p>
+      </div>
+      <div class="tile text reveal d1">
+        <h4>A grease pencil</h4>
+        <p>Circle your picks and cross out the misses, the way you mark a proof sheet. Everything circled
+          gathers in Selects, and Share and Make work on just those.</p>
+      </div>
+      <div class="tile text reveal d2">
+        <h4>Albums and trips</h4>
+        <p>Albums of your own, a photo in as many as you like. The trips you took, found for you and named
+          for the place. A day shot with a friend, sent by Send Nearby, becomes one roll.</p>
+      </div>
+    </div>
+    <p class="small-note center reveal" style="color: var(--ink-dim)">Rolls, albums, trips and the pencil are free. Place names need Geotag
+      Photos. Haku's other shelves of your library are part of the Darkroom.</p>
+  </div>
+</section>
+
 <!-- Darkroom -->
 <section id="darkroom" class="darkroom">
   <div class="inner">
     <div class="center">
       <p class="eyebrow reveal">The Darkroom</p>
       <h2 class="headline m reveal d1">Finish it<br>like film.</h2>
-      <p class="lede reveal d2">Eighteen tools for after the shot. Pay once and own them, or subscribe
+      <p class="lede reveal d2">Twenty tools for after the shot. Pay once and own them, or subscribe
         monthly. No account, and nothing leaves your phone.</p>
     </div>
     <div class="line reveal" aria-hidden="true"><div class="wire"></div><div class="prints"></div></div>
@@ -680,6 +719,21 @@
         <h4>Contact sheets</h4>
         <p>Your frames on 35mm, a lab proof or medium format, drawn down to the sprockets and the edge printing.</p>
         <img class="peek" src="/assets/iphone-contact.webp" width="760" height="1554" loading="lazy" alt="A contact sheet made in Haku">
+      </div>
+      <div class="tile dark text reveal">
+        <h4>A whole roll, one look</h4>
+        <p>Put one edit or recipe on a whole roll at once, or let an album develop everything in it in one
+          look. Each photo keeps its own crop, and goes back to its own look when it leaves.</p>
+      </div>
+      <div class="tile dark text reveal d1">
+        <h4>Zines and prints</h4>
+        <p>A roll or your circled frames as a zine: laid out to print at home and fold, for a print shop, as
+          a carousel, or folded from one sheet. Or 4&times;6 prints with the frame's details on the edge.</p>
+      </div>
+      <div class="tile dark text reveal d2">
+        <h4>Haku's albums</h4>
+        <p>Shelves Haku fills by reading your library: any colour you tap, every look and recipe, the light
+          it was shot in, and how it was shot - long exposures, macro, flash, the Duo on a table.</p>
       </div>
     </div>
 
@@ -725,7 +779,8 @@
     <div class="bento">
       <div class="tile dark reveal">
         <h4>Video too</h4>
-        <p>The take stays clean. Change the look after, trim it, export it graded.</p>
+        <p>The take stays clean and steady. Change the look after, trim it, export it graded, or bring one in
+          from Photos.</p>
         <img class="peek" src="/assets/iphone-video.webp" width="760" height="1554" loading="lazy" alt="Haku's video editor">
       </div>
       <div class="tile reveal d1">
@@ -739,8 +794,9 @@
           <li>Shutter, ISO, focus and white balance by hand</li><li>Focus peaking, zebras, waveform and histogram</li>
           <li>Highlight-weighted metering</li><li>Straighten and perspective, on three axes</li>
           <li>Grey-card white balance</li><li>A 35mm prime mode</li>
-          <li>Opens from the Lock Screen and Camera Control</li><li>Send Nearby, phone to phone</li>
-          <li>Hold any control to learn what it does</li>
+          <li>Opens from the Lock Screen and Camera Control</li><li>Send Nearby, photos and videos, phone to phone</li>
+          <li>Video stabilisation</li><li>Your own lens stops, and a zoom dial</li>
+          <li>Share a before and after</li><li>Hold any control to learn what it does</li>
         </ul>
       </div>
     </div>
@@ -1080,7 +1136,9 @@
       retouch: '<circle cx="12" cy="12" r="8"/><path d="M8.5 14.5c2 2 5 2 7 0M9 10h.01M15 10h.01" stroke-linecap="round" stroke-width="2"/>',
       selective: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>',
       carousel: '<rect x="3" y="7" width="11" height="12" rx="1.5"/><path d="M17 7v12M20.5 9v8"/>',
-      sheet: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9h18M3 15h18M7 5v4m5-4v4m5-4v4M7 15v4m5-4v4m5-4v4"/>'
+      sheet: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9h18M3 15h18M7 5v4m5-4v4m5-4v4M7 15v4m5-4v4m5-4v4"/>',
+      zine: '<path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/>',
+      albums: '<rect x="4" y="9" width="13" height="11" rx="1.5"/><path d="M7 6h12v11M18.5 2.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/>'
     };
     var F = [
       ['looks', 'Film looks', 'Film looks, and Fujifilm recipes', "Fujifilm's own simulations, any F-Log2 cube, published recipes."],
@@ -1100,7 +1158,9 @@
       ['selective', 'Selective', 'Selective adjust', 'Edit only what is under a point you tap.'],
       ['roll', 'Whole roll', 'Edit a whole roll', 'One edit or recipe onto a whole roll at once.'],
       ['carousel', 'Carousels', 'Carousels', 'One picture spanning two Instagram slides.'],
-      ['sheet', 'Contact sheets', 'Contact sheets', '35mm, lab proof or medium format sheets.']
+      ['sheet', 'Contact sheets', 'Contact sheets', '35mm, lab proof or medium format sheets.'],
+      ['zine', 'Zines', 'Zines and prints', 'A roll as a zine to fold, or 4×6 prints.'],
+      ['albums', 'Albums', "Haku's albums", 'Colour, the light, every look: shelves Haku fills itself.']
     ];
     var svg = function (k) {
       return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true">' + G[k] + '</svg>';
