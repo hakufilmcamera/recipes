@@ -31,17 +31,18 @@
   <p class="lede">No accounts, no analytics, no advertising. Here is exactly what Haku does and does not do.</p>
 </header>
 <main class="wrap doc">
-  <p class="effective"><em>Effective 2026-08-26</em></p>
+  <p class="effective"><em>Effective 2026-11-16</em></p>
   <p>Haku is a camera app. Your photos are yours, and Haku is built so that nothing about them — or you — ever reaches us or anyone else.</p>
   <h2>What Haku collects</h2>
   <p>Nothing. Haku has no accounts, no analytics, and no advertising. The app never transmits anything about you or your photos.</p>
-  <p>Haku makes network requests only in the Community page of Recipes, and nowhere else in the app:</p>
+  <p>Haku makes network requests in two places and nowhere else in the app: the Community page of Recipes, and, if Geotag Photos is on, asking Apple for the names of places (see <strong>Place names</strong> below). In the Community page:</p>
   <ul>
   <li><strong>Fetching</strong> the public list of community-shared recipes, its vote counts, and the photographs their authors chose to show them on. These are files in a public repository, downloaded the way a browser downloads a page; nothing is sent with them beyond what any download carries.</li>
   <li><strong>Voting</strong>, when you tap the thumbs-up on a recipe: the recipe&#x27;s name is sent and nothing else. No account, no identifier, nothing about you or your phone.</li>
   <li><strong>Submitting</strong>, and only when you tap Submit on a recipe you chose to offer: the recipe&#x27;s settings, the name you asked to be credited, the line you wrote about it, the tags you picked, and the one to three photographs you selected. Those photographs are rendered fresh from your originals for the purpose, which means they carry no location, no camera details and no other metadata - the original never leaves your phone. It all goes to a small relay of ours that files it for review, and is published only if it is approved.</li>
   </ul>
-  <p>Never visiting that page means Haku makes no requests at all.</p>
+  <p><strong>Place names.</strong> With Geotag Photos on, the library names your rolls and trips for where they were shot - &quot;Kamimeguro&quot;, &quot;Okinawa&quot;. To get a name, your iPhone asks Apple&#x27;s maps service what place a photo&#x27;s coordinates are, and Apple answers with the name. The request goes from your phone to Apple and is handled under Apple&#x27;s privacy policy; it does not come to us, we run no server that sees it, and we have no access to it. Only a few photos per roll or trip are asked about, and the names are kept on your phone. Turn Geotag Photos off and no such request is made.</p>
+  <p>With Geotag Photos off, never visiting the Community page means Haku makes no requests at all.</p>
   <p><strong>Send Nearby</strong> moves a photograph directly between two phones standing together, over the same device-to-device radio AirDrop uses. Nothing touches the internet, no server is involved, and it only runs while the Nearby screen is open on both phones - iOS asks for local-network permission the first time, and that permission covers exactly this.</p>
   <p>The relay that files a submission counts requests briefly by network address, in memory only, so that nobody can flood the review queue. It is not stored, not written to a log and not attached to anything; it is gone the moment the relay restarts.</p>
   <h2>Why the App Store label says &quot;Data Not Collected&quot;</h2>
@@ -57,7 +58,7 @@
   <ul>
   <li><strong>Photos, videos and edits.</strong> Originals, RAW files, recordings, edit recipes and thumbnails are stored in the app&#x27;s private container on your device, in your iCloud/system Photos library if you choose a storage mode that uses it, or both. Haku never sees them anywhere else.</li>
   <li><strong>Sound.</strong> Recording a video captures audio through the microphone, which is written into that video file and nothing else. Haku does not listen at any other time, and declining the microphone permission records silent video rather than no video.</li>
-  <li><strong>Location.</strong> Only if you turn on Geotag Photos (off unless you choose it, in the setup or in Settings &gt; Library) and grant location access, the current location is embedded in each photo&#x27;s EXIF metadata — the same field every camera writes — so Photos can place your shots on a map. It is written into your own files and nowhere else. Leave it off, or decline the permission, and everything else works unchanged.</li>
+  <li><strong>Location.</strong> Geotag Photos is offered in the setup, switched on, and is yours to turn off there or in Settings &gt; Library. While it is on and you have granted location access, the current location is embedded in each photo&#x27;s EXIF metadata — the same field every camera writes — so Photos can place your shots on a map. It is written into your own files; the only other use is asking Apple for place names, described above. Turn it off, or decline the permission, and everything else works unchanged.</li>
   <li><strong>Settings and film looks.</strong> Your preferences, custom setups, recipes and any LUT files you import are stored on your device only.</li>
   <li><strong>Home Screen widget.</strong> Haku keeps small copies (under 500 pixels) of your twelve most recent photographs, and the names of their recipes or looks, in a container shared only between Haku and its own widget, on this device - so the widget has something to show the moment you add it. Deleting a photo removes its copy. Nothing in it leaves your phone.</li>
   </ul>
