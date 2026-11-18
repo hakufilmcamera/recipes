@@ -288,8 +288,10 @@
   .duo { background: radial-gradient(90% 60% at 50% 0%, #26221c 0%, var(--night) 70%); }
   .duo-hero { margin: 64px auto 0; width: min(1080px, 100%); }
   /* The open Duo, then the folded Duo below it: Classic and Modern slide
-     out from behind Field as the row scrolls into view (the script sets
-     their transform; without it they simply stand in place). */
+     out from behind Field as the row scrolls into view (taken out for a
+     fade in place on 2026-11-18 over Apple's "don't animate" line, and put
+     back the same night at the owner's word); the pose picker follows at
+     the section's foot. */
   .duo { padding-top: 0; overflow: clip; }
   /* Each part is one screen tall, as when the section was pinned, so the
      devices take whatever height the words leave - the sizes they had. */
@@ -318,6 +320,72 @@
     .folded { flex: none; }
     .folded img { max-height: none; }
   }
+  /* The pose picker: the device on the right at one physical scale (a
+     square stage the open Duo's width across; each image's --w is its
+     width's share of that), the positions on the left, the chosen one
+     opened into its words. A pose changes by a dissolve: the new image
+     fades up as the old one goes, nothing moves. */
+  .poses-lede { max-width: 640px; margin-left: auto; margin-right: auto; }
+  .poses { max-width: 1180px; margin: clamp(36px, 6vw, 72px) auto 0; display: grid;
+           grid-template-columns: minmax(280px, 400px) minmax(0, 1fr); gap: clamp(24px, 4vw, 64px);
+           align-items: center; }
+  .pose-stage { position: relative; order: 2; width: min(100%, 76vh, 720px); aspect-ratio: 1; justify-self: center; }
+  .pose-img { position: absolute; left: 50%; top: 50%; width: var(--w); height: auto;
+              transform: translate(-50%, -50%); opacity: 0;
+              transition: opacity .26s cubic-bezier(.5, 0, .9, .5); }
+  /* The old pose is mostly gone before the new one comes up, so the two
+     barely overlap: a dissolve, not a double exposure. */
+  .pose-img.on { opacity: 1; transition: opacity .44s cubic-bezier(.15, .5, .4, 1) .14s; z-index: 1; }
+  html:not(.js) .pose-img:not(.on) { display: none; }
+  .pose-list { order: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .pose { border-radius: 30px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+          transition: background .3s, border-color .3s; max-width: 100%; }
+  .pose > button { display: flex; align-items: center; gap: 14px; padding: 16px 26px 16px 18px; border: 0;
+                   background: none; color: var(--snow); font: 500 19px var(--text); cursor: pointer;
+                   border-radius: 30px; text-align: left; }
+  .pose > button i { flex: none; width: 28px; height: 28px; border-radius: 50%; position: relative;
+                     border: 1.5px solid rgba(245,245,247,.75); }
+  .pose > button i::before, .pose > button i::after { content: ""; position: absolute; left: 50%; top: 50%;
+                     width: 11px; height: 1.5px; background: var(--snow); transform: translate(-50%, -50%); }
+  .pose > button i::after { transform: translate(-50%, -50%) rotate(90deg); transition: transform .3s; }
+  .pose > button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .pose p { margin: 0; font-size: 17px; line-height: 1.45; color: var(--snow-dim); }
+  .pose p b { color: var(--snow); font-weight: 600; }
+  .pose p a, .pose-words p a { color: var(--snow); text-decoration: underline; text-underline-offset: 3px;
+                               text-decoration-color: rgba(245,245,247,.4); }
+  .pose > p, .pose > .pose-more { display: none; padding: 0 30px 26px; max-width: 520px; }
+  .pose.on { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.16); }
+  .pose.on > button { padding-bottom: 12px; }
+  .pose.on > button i { background: var(--orange); border-color: var(--orange); }
+  .pose.on > button i::after { transform: translate(-50%, -50%) rotate(0deg); }
+  .pose.on > p, .pose.on > .pose-more { display: block; }
+  html:not(.js) .pose > p, html:not(.js) .pose > .pose-more { display: block; }
+  .pose-words { display: none; grid-column: 1 / -1; order: 3; }
+  .bodies-pick { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .bodies-pick button { border-radius: 99px; padding: 7px 15px; font: 500 12px var(--display);
+                        letter-spacing: .18em; text-transform: uppercase; cursor: pointer;
+                        color: var(--snow-dim); background: transparent; border: 1px solid rgba(255,255,255,.22); }
+  .bodies-pick button[aria-pressed="true"] { color: var(--night); background: var(--snow); border-color: var(--snow); }
+  @media (prefers-reduced-motion: reduce) { .pose-img, .pose-img.on { transition: none; } }
+  /* Narrow: the device on top, the positions as a row of pills under it,
+     and the chosen position's words under those. */
+  @media (max-width: 820px) {
+    .poses { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .pose-stage { order: 0; width: min(100%, 560px); }
+    .pose-list { display: grid; grid-template-columns: repeat(5, max-content); gap: 8px; overflow-x: auto;
+                 scrollbar-width: none; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter) 4px;
+                 scroll-padding: 0 var(--gutter); }
+    .pose-list::-webkit-scrollbar { display: none; }
+    .pose { border-radius: 99px; }
+    .pose > button { font-size: 15px; padding: 10px 18px 10px 12px; gap: 10px; }
+    .pose > button i { width: 22px; height: 22px; }
+    .pose > button i::before, .pose > button i::after { width: 9px; }
+    .pose.on > button { padding-bottom: 10px; }
+    .pose.on > p, .pose.on > .pose-more { display: none; }
+    .pose-words { display: block; padding: 4px 2px 0; min-height: 7.5em; }
+    .pose-words p { margin: 0; font-size: 17px; line-height: 1.45; color: var(--snow-dim); }
+    .pose-words p b { color: var(--snow); font-weight: 600; }
+  }
   .badge { display: inline-flex; gap: 8px; align-items: center; border-radius: 99px; padding: 8px 16px;
            font-size: 13px; margin-bottom: 26px; }
   .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--orange);
@@ -328,11 +396,20 @@
   .trio figcaption, .cap { font: 500 12px var(--display); letter-spacing: .24em; text-transform: uppercase;
                            color: var(--snow-dim); margin-top: 18px; }
   .light-sec .cap, .white-sec .cap { color: var(--ink-dim); }
-  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: clamp(48px, 7vw, 90px); }
+  /* The Duo section's two closing facts (the third, "Every pose", went
+     when the pose picker came to say it, 2026-11-18): side by side, and
+     compact on a phone, where they stack. */
+  .facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 860px;
+           margin: clamp(48px, 7vw, 90px) auto 0; }
   .fact { border-radius: 26px; padding: 30px 28px; }
   .fact h4 { font: 400 22px/1.15 var(--display); text-transform: uppercase; margin: 0 0 10px; letter-spacing: .02em; }
   .fact p { margin: 0; font-size: 16px; color: var(--snow-dim); }
-  @media (max-width: 820px) { .facts { grid-template-columns: 1fr; } }
+  @media (max-width: 820px) {
+    .facts { grid-template-columns: 1fr; gap: 10px; }
+    .fact { border-radius: 22px; padding: 18px 20px; }
+    .fact h4 { font-size: 17px; margin-bottom: 6px; }
+    .fact p { font-size: 15px; line-height: 1.4; }
+  }
   .outer { margin: clamp(32px, 5vw, 64px) auto 0; }
 
   /* ---------- Editor ---------- */
@@ -587,8 +664,7 @@
 <!-- Duo -->
 <section id="duo" class="duo">
   <!-- The open Duo, then, scrolled to, the folded Duo: Field first, with
-       Classic and Modern sliding out from behind it as the row comes into
-       view. Apple's own device images, untouched. Without JavaScript the
+       Classic and Modern fading in beside it as the row comes into view. Apple's own device images, untouched. Without JavaScript the
        three simply stand in a row. -->
   <div class="duo-stage">
     <div class="duo-step">
@@ -622,18 +698,103 @@
     <h3 class="headline m reveal" style="margin-top: clamp(24px, 5vw, 60px)">Stand it half-folded.<br>A waist-level camera.</h3>
     <p class="lede reveal d1">Set the Duo down half-open and look into it the way you would a twin-lens
       reflex: the picture on the half that lies flat, the controls on the half that stands, and two
-      instruments along the top - the look in a memo holder, a frame counter, a level or a light meter.</p>
+      instruments along the top - the look in a memo holder, a frame counter, a level or a light meter.
+      Or swap the finder up to the standing half, like a laptop's screen.</p>
+    <img class="outer reveal d2" src="/assets/duo-half-folded.webp?v=6" width="1321" height="999" loading="lazy"
+         style="width: min(760px, 100%)" alt="Haku's Field body on an iPhone Duo stood half-folded: the controls on the standing half, the finder on the half that lies flat">
 
     <h3 class="headline m reveal" style="margin-top: clamp(48px, 8vw, 110px)">Your subject<br>sees the shot.</h3>
     <p class="lede reveal d1">Duo Preview puts the graded frame on the outer screen, so the person you are
       photographing sees what you see. Or turn on Kid Cue: something bright, so a child looks at the lens.</p>
     <img class="outer reveal d2" src="/assets/duo-outer.webp" width="1400" height="1005" loading="lazy"
          style="width: min(760px, 100%)" alt="The back of an open iPhone Duo, its outer screen showing the portrait being taken">
-
+  </div>
+  <!-- The poses, Apple's way round: pick one beside the device and the
+       device changes to it. Apple's own device images, untouched and at one
+       physical scale (each image's width is its share of the open Duo's
+       3,093px), changing by a dissolve - the transition Apple's marketing
+       guidelines allow; they rule out animating, tilting or rendering the
+       device, so a 3D Duo was tried and taken out (2026-11-18). Without
+       JavaScript the open Duo shows and every pose's words are listed. -->
+  <div class="inner center">
+    <h3 class="headline m reveal" style="margin-top: clamp(56px, 9vw, 120px)">Every way you hold it.<br>A camera made for it.</h3>
+    <p class="lede reveal d2 poses-lede">Haku has a layout for each way the Duo opens. Choose one to see it.</p>
+  </div>
+  <div class="poses" data-pose="open">
+    <div class="pose-stage" aria-live="polite">
+      <img class="pose-img on" data-for="open" src="/assets/duo-open-camera.webp?v=4" width="2000" height="1453"
+           style="--w: 100%" alt="Haku's Field body on an open iPhone Duo">
+      <img class="pose-img" data-for="upright" src="/assets/duo-upright-editor.webp?v=2" width="1000" height="1377"
+           loading="lazy" style="--w: 72.65%" alt="Haku's immersive editor on an upright open iPhone Duo">
+      <img class="pose-img" data-for="half" data-level="eye" data-view="classic" src="/assets/duo-half-folded-eye.webp?v=1" width="1321" height="999"
+           loading="lazy" style="--w: 85.42%" alt="Haku's Classic body on an iPhone Duo stood half-folded: the finder on the standing half, the controls on the half that lies flat">
+      <img class="pose-img" data-for="half" data-level="waist" data-view="field" src="/assets/duo-half-folded.webp?v=6" width="1321" height="999"
+           loading="lazy" style="--w: 85.42%" alt="Haku's Field body on an iPhone Duo stood half-folded: the controls on the standing half, the finder on the half that lies flat">
+      <img class="pose-img" data-for="closed" data-view="classic" src="/assets/duo-closed-classic.webp?v=3" width="800" height="1115"
+           loading="lazy" style="--w: 50.89%" alt="Classic body on the folded iPhone Duo">
+      <img class="pose-img" data-for="closed" data-view="field" src="/assets/duo-closed-field.webp?v=3" width="800" height="1115"
+           loading="lazy" style="--w: 50.89%" alt="Field body on the folded iPhone Duo">
+      <img class="pose-img" data-for="closed" data-view="modern" src="/assets/duo-closed-modern.webp?v=3" width="800" height="1115"
+           loading="lazy" style="--w: 50.89%" alt="Modern body on the folded iPhone Duo">
+      <img class="pose-img" data-for="closed" data-view="editor" src="/assets/duo-closed-editor.webp?v=1" width="800" height="1115"
+           loading="lazy" style="--w: 50.89%" alt="Haku's editor on the folded iPhone Duo, its tools floating over the photograph">
+      <img class="pose-img" data-for="preview" src="/assets/duo-outer.webp?v=2" width="1400" height="1005"
+           loading="lazy" style="--w: 98.8%" alt="The back of an open iPhone Duo, its outer screen showing the portrait being taken">
+    </div>
+    <div class="pose-list" role="group" aria-label="Positions">
+      <div class="pose on">
+        <button type="button" aria-pressed="true" data-pose="open"><i></i>Wide</button>
+        <p><b>Open wide.</b> The whole camera is there: the frame, every key, every look, and your
+          roll running underneath as a strip of negative. Classic, Modern and the editor each open
+          their own way — <a href="https://apps.apple.com/app/id6798982888">get Haku</a> and see
+          for yourself.</p>
+      </div>
+      <div class="pose">
+        <button type="button" aria-pressed="false" data-pose="upright"><i></i>Tall</button>
+        <p><b>Open tall.</b> Turn it upright and Haku turns with it. In the editor the photograph
+          fills the screen and the tools float over it on glass. Every body stands tall too —
+          <a href="https://apps.apple.com/app/id6798982888">get Haku</a> and try them yourself.</p>
+      </div>
+      <div class="pose">
+        <button type="button" aria-pressed="false" data-pose="half"><i></i>Tabletop</button>
+        <div class="pose-more">
+          <p><b>Tabletop.</b> Stand it half-folded with the finder up at eye level, like a
+            laptop's screen, or swap it down to the half that lies flat and look into it the way
+            you would a twin-lens reflex. The controls take the other half, with a frame counter,
+            level or light meter at hand. Left still, it is its own tripod.</p>
+          <div class="bodies-pick" role="group" aria-label="Finder">
+            <button type="button" data-level="eye" aria-pressed="true">Eye level</button>
+            <button type="button" data-level="waist" aria-pressed="false">Waist level</button>
+          </div>
+        </div>
+      </div>
+      <div class="pose">
+        <button type="button" aria-pressed="false" data-pose="closed"><i></i>Pocket</button>
+        <div class="pose-more">
+          <p><b>Closed.</b> Each body becomes a rail beside the frame, keys right under your thumb.
+            It feels like holding a little camera, because it is one. The editor floats its tools
+            over the photograph.</p>
+          <div class="bodies-pick" role="group" aria-label="Camera body or editor">
+            <button type="button" data-view="classic" aria-pressed="false">Classic</button>
+            <button type="button" data-view="field" aria-pressed="true">Field</button>
+            <button type="button" data-view="modern" aria-pressed="false">Modern</button>
+            <button type="button" data-view="editor" aria-pressed="false">Editor</button>
+          </div>
+        </div>
+      </div>
+      <div class="pose">
+        <button type="button" aria-pressed="false" data-pose="preview"><i></i>Duo Preview</button>
+        <p><b>Duo Preview.</b> The outer screen shows the graded frame, so the person you are
+          photographing sees what you see. Or turn on Kid Cue: something bright, so a child looks
+          at the lens.</p>
+      </div>
+    </div>
+    <div class="pose-words" aria-live="polite"></div>
+  </div>
+  <div class="inner center">
     <div class="facts">
-      <div class="fact glass reveal"><h4>Every pose</h4><p>Folded, open wide, held upright or stood half-folded — each has its own layout, and controls keep their place between them.</p></div>
-      <div class="fact glass reveal d1"><h4>Split at the hinge</h4><p>Editor, recipes, looks and settings use both halves: the picture on one side, every tool on the other.</p></div>
-      <div class="fact glass reveal d2"><h4>One app</h4><p>The same Haku runs on every iPhone. On Duo, the layout follows the screen you are holding.</p></div>
+      <div class="fact glass reveal"><h4>Split at the hinge</h4><p>Editor, recipes, looks and settings use both halves: the picture on one side, every tool on the other.</p></div>
+      <div class="fact glass reveal d1"><h4>One app</h4><p>The same Haku runs on every iPhone. On Duo, the layout follows the screen you are holding.</p></div>
     </div>
   </div>
 </section>
@@ -1087,6 +1248,65 @@
     addEventListener('resize', function () { if (innerWidth !== width) measure(); tick(); });
     addEventListener('load', function () { measure(); draw(); });
     measure(); draw();
+  })();
+
+  // The Duo's poses: a position chosen beside the device brings its image
+  // up by a dissolve (the CSS), opens its words, and on a narrow screen
+  // copies them under the row of pills. Pocket has a body or the editor to
+  // choose, Tabletop the finder's level; Wide and Tall show one each and
+  // leave the rest for Haku itself (owner, 2026-11-18). A choice is kept
+  // across positions, shown where a position has an image of it, else its
+  // first; the pressed chip is what shows. The delegated listener serves
+  // both copies of the chips.
+  (function () {
+    var root = document.querySelector('.poses');
+    if (!root) return;
+    var imgs = [].slice.call(root.querySelectorAll('.pose-img'));
+    var items = [].slice.call(root.querySelectorAll('.pose'));
+    var words = root.querySelector('.pose-words');
+    var pose = 'open', view = 'field', level = 'eye';
+    function shown() {
+      var here = imgs.filter(function (im) {
+        return im.dataset.for === pose && (!im.dataset.level || im.dataset.level === level);
+      });
+      return here.filter(function (im) { return im.dataset.view === view; })[0] || here[0];
+    }
+    function show() {
+      var on = shown();
+      imgs.forEach(function (im) { im.classList.toggle('on', im === on); });
+      items.forEach(function (it) {
+        var b = it.querySelector(':scope > button'), here = b.dataset.pose === pose;
+        it.classList.toggle('on', here);
+        b.setAttribute('aria-pressed', here);
+        if (here) words.innerHTML = (it.querySelector(':scope > p') || it.querySelector('.pose-more')).outerHTML;
+      });
+      root.querySelectorAll('.bodies-pick button').forEach(function (b) {
+        b.setAttribute('aria-pressed', b.dataset.view ? b.dataset.view === on.dataset.view : b.dataset.level === level);
+      });
+      root.dataset.pose = pose;
+    }
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.pose) pose = b.dataset.pose;
+      else if (b.dataset.view) view = b.dataset.view;
+      else if (b.dataset.level) level = b.dataset.level;
+      else return;
+      show();
+      // On a phone the pill row scrolls sideways: keep the chosen one in it.
+      if (b.dataset.pose && b.scrollIntoView && innerWidth <= 820)
+        b.parentNode.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    });
+    // Up and down (or left and right) step through the positions.
+    root.querySelector('.pose-list').addEventListener('keydown', function (e) {
+      var d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+      if (!d || !e.target.dataset.pose) return;
+      e.preventDefault();
+      var i = items.findIndex(function (it) { return it.classList.contains('on'); });
+      var next = items[(i + d + items.length) % items.length].querySelector(':scope > button');
+      next.focus(); next.click();
+    });
+    show();
   })();
 
   // The carousel demo: slides snap like Instagram's; the arrows and dots
