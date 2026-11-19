@@ -173,7 +173,7 @@ function one(e) {
           <p class="small">The first button opens it in the app.
             Or open Haku yourself, go to Recipes &rsaquo; Community and search
             &ldquo;${esc(e.name)}&rdquo;.
-            ${e.lutURL ? `This one uses an imported film look: <a href="${esc(e.lutURL)}">download it</a>.`
+            ${/^https:\/\//i.test(e.lutURL || "") ? `This one uses an imported film look: <a href="${esc(e.lutURL)}">download it</a>.`
               : (e.recipe.edit.filmSimulation && !SHIPPED.includes(e.recipe.edit.filmSimulation))
                 ? `This one uses an imported film look. Open it in Haku and it shows you where to get the file.` : ""}</p>
           <p class="small"><a href="/recipes/">All recipes</a>
